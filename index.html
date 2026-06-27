@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سينما فلوكس | CinemaFlux - منصة المشاهدة السريعة</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #141414;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #000000;
+            padding: 20px;
+            text-align: center;
+            font-size: 26px;
+            font-weight: bold;
+            color: #e50914;
+            border-bottom: 2px solid #222;
+            letter-spacing: 1px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .video-player-box {
+            position: relative;
+            padding-bottom: 56.25%; /* نسبة 16:9 للمشغل */
+            height: 0;
+            overflow: hidden;
+            background-color: #000;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        .video-player-box iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        .video-info {
+            margin-top: 20px;
+            background-color: #181818;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .video-title {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        .video-desc {
+            font-size: 15px;
+            color: #aaa;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        🍿 سـينما فـلوكس | CinemaFlux
+    </header>
+
+    <div class="container">
+        <div class="video-player-box">
+            <iframe src="https://dood.li/e/your_video_id" allowfullscreen="true" scrolling="no"></iframe>
+        </div>
+
+        <div class="video-info">
+            <h1 class="video-title">عنوان الفيديو أو الفيلم التجريبي</h1>
+            <p class="video-desc">هنا يمكنك كتابة وصف قصير عن الفيديو أو الفيلم، قصة الفيلم، وأي معلومات أخرى تريد أن يراها الزائر أسفل المشغل.</p>
+        </div>
+    </div>
+
+</body>
+</html>
