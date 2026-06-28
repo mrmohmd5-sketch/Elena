@@ -3,40 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سينما فلوكس | CinemaFlux - منصة المشاهدة السريعة</title>
+    <title>سينما فلوكس | CinemaFlux - منصة المشاهدة الاحترافية</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #141414;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #111111;
             color: #ffffff;
             margin: 0;
             padding: 0;
         }
         header {
             background-color: #000000;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
-            font-size: 26px;
+            font-size: 24px;
             font-weight: bold;
             color: #e50914;
-            border-bottom: 2px solid #222;
-            letter-spacing: 1px;
+            border-bottom: 3px solid #e50914;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
         .container {
             max-width: 1000px;
-            margin: 30px auto;
-            padding: 0 20px;
+            margin: 20px auto;
+            padding: 0 15px;
         }
-        .video-player-box {
-            position: relative;
-            padding-bottom: 56.25%; /* نسبة 16:9 للمشغل */
-            height: 0;
-            overflow: hidden;
+        /* خانة البحث */
+        .search-box {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .search-box input {
+            width: 100%;
+            max-width: 500px;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: 1px solid #333;
+            border-radius: 25px;
+            background-color: #222;
+            color: #fff;
+            outline: none;
+            text-align: center;
+            transition: 0.3s;
+        }
+        .search-box input:focus {
+            border-color: #e50914;
+            box-shadow: 0 0 8px rgba(229, 9, 20, 0.5);
+        }
+        /* مشغل الفيديو */
+        .main-player {
             background-color: #000;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.7);
+            margin-bottom: 25px;
         }
-        .video-player-box iframe {
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+        }
+        .video-container iframe {
             position: absolute;
             top: 0;
             left: 0;
@@ -44,40 +71,182 @@
             height: 100%;
             border: 0;
         }
-        .video-info {
-            margin-top: 20px;
+        /* أزرار السيرفرات والجودة */
+        .server-buttons {
+            display: flex;
+            gap: 10px;
+            padding: 10px 15px;
             background-color: #181818;
+            border-top: 1px solid #252525;
+            justify-content: center;
+        }
+        .server-btn {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .server-btn.active, .server-btn:hover {
+            background-color: #e50914;
+        }
+        .video-details {
             padding: 20px;
-            border-radius: 8px;
+            background-color: #181818;
         }
         .video-title {
             font-size: 22px;
-            margin-bottom: 10px;
+            margin: 0 0 10px 0;
             color: #fff;
         }
         .video-desc {
-            font-size: 15px;
-            color: #aaa;
+            font-size: 14px;
+            color: #b3b3b3;
             line-height: 1.6;
+            margin: 0;
+        }
+        /* شبكة عرض الأفلام */
+        .section-title {
+            font-size: 20px;
+            margin: 30px 0 15px 0;
+            border-right: 4px solid #e50914;
+            padding-right: 10px;
+        }
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+        }
+        .movie-card {
+            background-color: #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #252525;
+        }
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(229,9,20,0.3);
+        }
+        .movie-poster {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background-color: #333;
+        }
+        .movie-info {
+            padding: 10px;
+            text-align: center;
+        }
+        .movie-name {
+            font-size: 14px;
+            font-weight: bold;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        🍿 سـينما فـلوكس | CinemaFlux
-    </header>
+    <header>🍿 سـينما فـلوكس | CinemaFlux</header>
 
     <div class="container">
-        <div class="video-player-box">
-            <iframe src="https://playmogo.com/e/yuj41p7m9e3e" allowfullscreen="true" scrolling="no"></iframe>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" onkeyup="searchMovies()" placeholder="🔍 ابحث عن فيلمك المفضل هنا...">
         </div>
 
-        <div class="video-info">
-            <h1 class="video-title">عنوان الفيديو أو الفيلم التجريبي</h1>
-            <p class="video-desc">هنا يمكنك كتابة وصف قصير عن الفيديو أو الفيلم، قصة الفيلم، وأي معلومات أخرى تريد أن يراها الزائر أسفل المشغل.</p>
+        <div class="main-player">
+            <div class="video-container">
+                <iframe id="mainIframe" src="https://playmogo.com/e/yuj41p7m9e3e" allowfullscreen="true" scrolling="no"></iframe>
+            </div>
+            <div class="server-buttons">
+                <button class="server-btn active" id="btnHD" onclick="changeServer('HD')">سيرفر HD (رئيسي)</button>
+                <button class="server-btn" id="btnSD" onclick="changeServer('SD')">سيرفر إنترنت ضعيف</button>
+            </div>
+            <div class="video-details">
+                <h1 id="currentTitle" class="video-title">فيلم Onward مدبلج</h1>
+                <p id="currentDesc" class="video-desc">قصة شقيقين من القزم يشرعان في رحلة استكشافية لمعرفة ما إذا كان لا يزال هناك بعض السحر المتبقي في العالم لقضاء يوم أخير مع والدهما الراحل.</p>
+            </div>
         </div>
+
+        <div class="section-title">أحدث الإضافات والأفلام</div>
+        
+        <div class="movies-grid" id="moviesGrid">
+            
+            <div class="movie-card" onclick="playMovie('فيلم Onward مدبلج', 'قصة شقيقين من القزم يشرعان في رحلة استكشافية لمعرفة ما إذا كان لا يزال هناك بعض السحر المتبقي في العالم لقضاء يوم أخير مع والدهما الراحل.', 'https://playmogo.com/e/yuj41p7m9e3e', 'https://playmogo.com/e/yuj41p7m9e3e')">
+                <img class="movie-poster" src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400" alt="Onward">
+                <div class="movie-info">
+                    <p class="movie-name">Onward مدبلج</p>
+                </div>
+            </div>
+
+            <div class="movie-card" onclick="playMovie('فيلم الأكشن والتحدي التجريبي', 'وصف تجريبي للفيلم الثاني لرؤية ميزة الانتقال السريع بين الأفلام.', 'https://playmogo.com/e/your_second_video_id', 'https://playmogo.com/e/your_second_video_id')">
+                <img class="movie-poster" src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400" alt="فيلم تجريبي">
+                <div class="movie-info">
+                    <p class="movie-name">فيلم تجريبي 2</p>
+                </div>
+            </div>
+
+        </div>
+
     </div>
 
+    <script>
+        // متغيرات لتخزين روابط الفيلم الحالي (عالي وضعيف)
+        let currentHD = "https://playmogo.com/e/yuj41p7m9e3e";
+        let currentSD = "https://playmogo.com/e/yuj41p7m9e3e"; 
+
+        // دالة تشغيل الفيلم عند الضغط عليه
+        function playMovie(title, desc, hdLink, sdLink) {
+            document.getElementById('currentTitle').innerText = title;
+            document.getElementById('currentDesc').innerText = desc;
+            currentHD = hdLink;
+            currentSD = sdLink;
+            
+            // تشغيل السيرفر الرئيسي افتراضياً
+            document.getElementById('mainIframe').src = hdLink;
+            document.getElementById('btnHD').classList.add('active');
+            document.getElementById('btnSD').classList.remove('active');
+            
+            // الصعود التلقائي للمشغل عند الضغط على الهاتف
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        // دالة تغيير السيرفر (HD أو إنترنت ضعيف)
+        function changeServer(type) {
+            if(type === 'HD') {
+                document.getElementById('mainIframe').src = currentHD;
+                document.getElementById('btnHD').classList.add('active');
+                document.getElementById('btnSD').classList.remove('active');
+            } else {
+                document.getElementById('mainIframe').src = currentSD;
+                document.getElementById('btnSD').classList.add('active');
+                document.getElementById('btnHD').classList.remove('active');
+            }
+        }
+
+        // دالة البحث الذكي
+        function searchMovies() {
+            let input = document.getElementById('searchInput').value.toLowerCase();
+            let cards = document.getElementsByClassName('movie-card');
+            
+            for (let i = 0; i < cards.length; i++) {
+                let name = cards[i].getElementsByClassName('movie-name')[0].innerText.toLowerCase();
+                if (name.includes(input)) {
+                    cards[i].style.display = "";
+                } else {
+                    cards[i].style.display = "none";
+                }
+            }
+        }
+    </script>
 </body>
 </html>
