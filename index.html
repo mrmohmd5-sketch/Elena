@@ -11,7 +11,7 @@
             color: #ffffff;
             margin: 0;
             padding: 0;
-            padding-bottom: 30px;
+            padding-bottom: 5px;
         }
         header {
             background-color: #06090c;
@@ -47,18 +47,10 @@
             outline: none;
             text-align: right;
         }
-        .search-box input:focus {
-            border-color: #e50914;
-        }
+        .search-box input:focus { border-color: #e50914; }
         .search-btn {
-            background-color: #e50914;
-            color: white;
-            border: none;
-            padding: 0 25px;
-            font-size: 15px;
-            font-weight: bold;
-            border-radius: 25px;
-            cursor: pointer;
+            background-color: #e50914; color: white; border: none;
+            padding: 0 25px; font-size: 15px; font-weight: bold; border-radius: 25px; cursor: pointer;
         }
 
         /* المشغل الرئيسي المتطور */
@@ -68,152 +60,80 @@
             overflow: hidden;
             margin-bottom: 25px;
             border: 1px solid #1c252d;
-            display: none; /* يظهر فقط عند تشغيل فيلم */
+            display: none;
         }
         .video-container {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
+            position: relative; padding-bottom: 56.25%; height: 0;
         }
         .video-container iframe {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%; border: 0;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;
         }
-        .server-buttons {
-            display: flex; gap: 10px; padding: 10px; background-color: #06090c; justify-content: center;
+        .player-controls {
+            display: flex; gap: 10px; padding: 10px; background-color: #06090c; justify-content: center; flex-wrap: wrap;
         }
-        .server-btn {
-            background-color: #121b22; color: #fff; border: 1px solid #1c252d; padding: 8px 16px; font-size: 13px; border-radius: 5px; cursor: pointer;
+        .server-btn, .cast-btn {
+            background-color: #121b22; color: #fff; border: 1px solid #1c252d; padding: 8px 16px; font-size: 13px; border-radius: 5px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
         }
         .server-btn.active { background-color: #e50914; border-color: #e50914; }
+        .cast-btn { background-color: #28a745; border-color: #28a745; }
         .video-details { padding: 15px; background-color: #06090c; }
         .video-title { font-size: 18px; margin: 0 0 5px 0; }
         .video-desc { font-size: 13px; color: #9aa6b1; margin: 0; line-height: 1.5; }
 
-        /* بنر العرض العلوي الكبير (مثل الصورة) */
-        .hero-banner {
-            position: relative;
-            width: 100%;
-            height: 220px;
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 25px;
-            background-image: linear-gradient(to top, #0b1116 10%, transparent 90%), url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800');
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            align-items: flex-end;
-            border: 1px solid #1c252d;
+        /* البانر العلوي المتحرك تلقائياً */
+        .carousel-container {
+            position: relative; width: 100%; height: 220px; border-radius: 12px; overflow: hidden; margin-bottom: 25px; border: 1px solid #1c252d;
         }
-        .hero-content {
-            padding: 20px;
-            width: 100%;
+        .carousel-track {
+            display: flex; width: 100%; height: 100%; transition: transform 0.5s ease-in-out;
         }
-        .hero-title {
-            font-size: 22px;
-            font-weight: bold;
-            margin: 0 0 10px 0;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        .carousel-slide {
+            min-width: 100%; height: 100%; position: relative; background-size: cover; background-position: center; display: flex; align-items: flex-end;
         }
+        .carousel-content {
+            padding: 20px; width: 100%; background: linear-gradient(to top, #0b1116 20%, transparent 100%);
+        }
+        .hero-title { font-size: 22px; font-weight: bold; margin: 0 0 10px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
         .hero-btn {
-            background-color: #e50914;
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            font-size: 14px;
-            font-weight: bold;
-            border-radius: 20px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
+            background-color: #e50914; color: white; border: none; padding: 8px 20px; font-size: 14px; font-weight: bold; border-radius: 20px; cursor: pointer;
         }
 
-        /* أقسام العرض الأفقية المتطورة (التمرير يميناً ويساراً للهواتف) */
-        .row-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 25px 0 12px 0;
+        /* سجل المشاهدة */
+        .history-section {
+            background-color: #06090c; padding: 15px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #1c252d; display: none;
         }
-        .row-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #fff;
+        .history-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
         }
-        .row-more {
-            font-size: 13px;
-            color: #9aa6b1;
-            text-decoration: none;
+        .clear-all-btn {
+            background-color: #dc3545; color: #fff; border: none; padding: 4px 10px; font-size: 12px; border-radius: 4px; cursor: pointer;
         }
-        .movies-slider {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-            scroll-behavior: smooth;
+        .history-list { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
+        .history-item {
+            position: relative; background-color: #121b22; padding: 8px 30px 8px 10px; border-radius: 5px; font-size: 12px; white-space: nowrap; border: 1px solid #1c252d;
         }
-        /* إخفاء شريط التمرير الافتراضي لشكل أجمل */
-        .movies-slider::-webkit-scrollbar {
-            height: 4px;
+        .delete-item-btn {
+            position: absolute; right: 8px; top: 50%; transform: translateY(-50%); color: #dc3545; cursor: pointer; font-weight: bold;
         }
-        .movies-slider::-webkit-scrollbar-thumb {
-            background-color: #1c252d;
-            border-radius: 10px;
-        }
+
+        /* صفوف العرض الممررة */
+        .row-header { display: flex; justify-content: space-between; align-items: center; margin: 25px 0 12px 0; }
+        .row-title { font-size: 18px; font-weight: bold; color: #fff; border-right: 4px solid #e50914; padding-right: 8px; }
+        .movies-slider { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; }
+        .movies-slider::-webkit-scrollbar { height: 4px; }
+        .movies-slider::-webkit-scrollbar-thumb { background-color: #1c252d; border-radius: 10px; }
         
-        /* كارت الفيلم بتصميم سينمانا */
-        .movie-card {
-            min-width: 130px;
-            max-width: 130px;
-            background-color: transparent;
-            cursor: pointer;
-        }
-        .poster-wrapper {
-            position: relative;
-            width: 100%;
-            height: 185px;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid #1c252d;
-        }
-        .movie-poster {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .movie-info {
-            padding: 6px 0;
-        }
-        .movie-name {
-            font-size: 13px;
-            font-weight: bold;
-            margin: 0 0 4px 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .movie-meta {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 11px;
-            color: #9aa6b1;
-        }
-        .imdb-badge {
-            background-color: #1c252d;
-            color: #fff;
-            padding: 1px 4px;
-            border-radius: 3px;
-            font-weight: bold;
-            font-size: 10px;
-        }
+        /* كارت العرض */
+        .movie-card { min-width: 130px; max-width: 130px; }
+        .poster-wrapper { position: relative; width: 100%; height: 185px; border-radius: 8px; overflow: hidden; border: 1px solid #1c252d; }
+        .movie-poster { width: 100%; height: 100%; object-fit: cover; }
+        .movie-info { padding: 6px 0; }
+        .movie-name { font-size: 13px; font-weight: bold; margin: 0 0 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .movie-meta { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #9aa6b1; }
+        .imdb-badge { background-color: #1c252d; color: #fff; padding: 1px 4px; border-radius: 3px; font-weight: bold; font-size: 10px; }
 
         .no-results {
-            display: none;
-            text-align: center;
-            padding: 20px;
-            color: #9aa6b1;
+            display: none; text-align: center; padding: 30px 15px; color: #9aa6b1; font-size: 14px; line-height: 1.6; background-color: #06090c; border-radius: 8px; border: 1px solid #1c252d; margin-top: 20px;
         }
     </style>
 </head>
@@ -224,17 +144,26 @@
     <div class="container">
         
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="ابحث عن اسم الفيلم...">
-            <button class="search-btn" onclick="searchMovies()">بحث</button>
+            <input type="text" id="searchInput" placeholder="ابحث عن اسم الفيلم أو المسلسل...">
+            <button class="search-btn" onclick="searchItems()">بحث</button>
+        </div>
+
+        <div class="history-section" id="historySection">
+            <div class="history-header">
+                <div class="row-title" style="border-right-color: #28a745;">سجل المشاهدة مؤخراً</div>
+                <button class="clear-all-btn" onclick="clearFullHistory()">حذف السجل بالكامل 🗑️</button>
+            </div>
+            <div class="history-list" id="historyList"></div>
         </div>
 
         <div class="main-player" id="videoPlayerSection">
             <div class="video-container">
                 <iframe id="mainIframe" src="" allowfullscreen="true" scrolling="no"></iframe>
             </div>
-            <div class="server-buttons">
+            <div class="player-controls">
                 <button class="server-btn active" id="btnHD" onclick="changeServer('HD')">سيرفر عالي الجودة</button>
                 <button class="server-btn" id="btnSD" onclick="changeServer('SD')">سيرفر إنترنت ضعيف</button>
+                <button class="cast-btn" onclick="castToTV()">📺 بث للشاشة</button>
             </div>
             <div class="video-details">
                 <h1 id="currentTitle" class="video-title">-</h1>
@@ -242,69 +171,84 @@
             </div>
         </div>
 
-        <div class="hero-banner" id="heroBanner">
-            <div class="hero-content">
-                <div class="hero-title">فيلم Onward مدبلج</div>
-                <button class="hero-btn" onclick="playMovie('فيلم Onward مدبلج', 'قصة شقيقين من القزم يشرعان في رحلة استكشافية لمعرفة ما إذا كان لا يزال هناك بعض السحر المتبقي في العالم لقضاء يوم أخير مع والدهما الراحل.', 'https://playmogo.com/e/yuj41p7m9e3e', 'https://playmogo.com/e/yuj41p7m9e3e')">🎬 شاهد الآن</button>
-            </div>
-        </div>
-
-        <div id="noResultsMessage" class="no-results">عذراً، لم نجد أي فيلم بهذا الاسم! 🔍</div>
-
-        <div class="row-header">
-            <div class="row-title">أحدث الأفلام المضافة</div>
-            <a href="#" class="row-more">المزيد</a>
-        </div>
-        
-        <div class="movies-slider" id="moviesSlider1">
-            
-            <div class="movie-card" onclick="playMovie('فيلم Onward مدبلج', 'قصة شقيقين من القزم يشرعان في رحلة استكشافية لمعرفة ما إذا كان لا يزال هناك بعض السحر المتبقي في العالم لقضاء يوم أخير مع والدهما الراحل.', 'https://playmogo.com/e/yuj41p7m9e3e', 'https://playmogo.com/e/yuj41p7m9e3e')">
-                <div class="poster-wrapper">
-                    <img class="movie-poster" src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400" alt="Onward">
+        <div class="carousel-container" id="heroCarousel">
+            <div class="carousel-track" id="carouselTrack">
+                <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800');">
+                    <div class="carousel-content">
+                        <div class="hero-title">فيلم Onward مدبلج</div>
+                        <button class="hero-btn" onclick="playItem('فيلم Onward مدبلج', 'قصة شقيقين من القزم يشرعان في رحلة...', 'https://playmogo.com/e/yuj41p7m9e3e', 'https://playmogo.com/e/yuj41p7m9e3e', 'movie')">🎬 شاهد الآن</button>
+                    </div>
                 </div>
-                <div class="movie-info">
-                    <p class="movie-name">Onward مدبلج</p>
-                    <div class="movie-meta">
-                        <span class="imdb-badge">7.4</span>
-                        <span>انيميشن, دبلجة</span>
+                <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800');">
+                    <div class="carousel-content">
+                        <div class="hero-title">مسلسل الفنتازيا التجريبي</div>
+                        <button class="hero-btn" onclick="playItem('مسلسل الفنتازيا التجريبي', 'حلقات حصرية ومثيرة للتجربة...', 'https://playmogo.com/e/your_series_id', 'https://playmogo.com/e/your_series_id', 'series')">🎬 شاهد الحلقات</button>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="movie-card" onclick="playMovie('فيلم تجريبي 2', 'هذا وصف للفيلم التجريبي الثاني المضاف للتأكد من ميزة التمرير الأفقي.', 'https://playmogo.com/e/your_second_id', 'https://playmogo.com/e/your_second_id')">
-                <div class="poster-wrapper">
-                    <img class="movie-poster" src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400" alt="تجريبي">
-                </div>
-                <div class="movie-info">
-                    <p class="movie-name">فيلم تجريبي 2</p>
-                    <div class="movie-meta">
-                        <span class="imdb-badge">8.0</span>
-                        <span>أكشن, إثارة</span>
+        <div id="noResultsMessage" class="no-results">عذراً لا توجد نتائج ، قم بأدخل كلمات مختلفة او ربما انت قمت بكتابة الاسم بشكل غير صحيح 🔍</div>
+
+        <div id="moviesBlock">
+            <div class="row-header"><div class="row-title">قسم الأفلام</div></div>
+            <div class="movies-slider" id="moviesSlider">
+                <div class="movie-card" data-type="movie" onclick="playItem('فيلم Onward مدبلج', 'قصة شقيقين من القزم يشرعان في رحلة استكشافية لمعرفة ما إذا كان لا يزال هناك بعض السحر المتبقي في العالم لقضاء يوم أخير مع والدهما الراحل.', 'https://playmogo.com/e/yuj41p7m9e3e', 'https://playmogo.com/e/yuj41p7m9e3e', 'movie')">
+                    <div class="poster-wrapper"><img class="movie-poster" src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400"></div>
+                    <div class="movie-info">
+                        <p class="movie-name">Onward مدبلج</p>
+                        <div class="movie-meta"><span class="imdb-badge">7.4</span><span>انيميشن</span></div>
                     </div>
                 </div>
             </div>
+        </div>
 
+        <div id="seriesBlock">
+            <div class="row-header"><div class="row-title">قسم المسلسلات</div></div>
+            <div class="movies-slider" id="seriesSlider">
+                <div class="movie-card" data-type="series" onclick="playItem('مسلسل الفنتازيا التجريبي', 'وصف تجريبي لمسلسل لرؤية ميزة فرز واجهة المسلسلات.', 'https://playmogo.com/e/your_series_id', 'https://playmogo.com/e/your_series_id', 'series')">
+                    <div class="poster-wrapper"><img class="movie-poster" src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400"></div>
+                    <div class="movie-info">
+                        <p class="movie-name">مسلسل الفنتازيا التجريبي</p>
+                        <div class="movie-meta"><span class="imdb-badge">8.5</span><span>دراما, سحر</span></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>
 
     <script>
-        let currentHD = "";
-        let currentSD = ""; 
+        let currentHD = "", currentSD = "";
+        let watchHistory = JSON.parse(localStorage.getItem('cinemaFluxHistory')) || [];
 
-        function playMovie(title, desc, hdLink, sdLink) {
-            // إظهار قسم المشغل
+        // تشغيل البانر العلوي تلقائياً وتمريره بشكل دوري ومستمر
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.carousel-slide');
+        setInterval(() => {
+            currentSlide = (currentSlide + 1) % slides.length;
+            document.getElementById('carouselTrack').style.transform = `translateX(${currentSlide * 100}%)`;
+        }, 4000); // يتحرك تلقائياً كل 4 ثوانٍ
+
+        // عرض سجل المشاهدة المخزن عند تحميل الصفحة
+        updateHistoryUI();
+
+        function playItem(title, desc, hdLink, sdLink, type) {
             document.getElementById('videoPlayerSection').style.display = "block";
-            
             document.getElementById('currentTitle').innerText = title;
             document.getElementById('currentDesc').innerText = desc;
-            currentHD = hdLink;
-            currentSD = sdLink;
-            
+            currentHD = hdLink; currentSD = sdLink;
             document.getElementById('mainIframe').src = hdLink;
+            
             document.getElementById('btnHD').classList.add('active');
             document.getElementById('btnSD').classList.remove('active');
             
+            // إضافة السجل بدون تكرار
+            watchHistory = watchHistory.filter(item => item.title !== title);
+            watchHistory.unshift({ title, desc, hdLink, sdLink, type });
+            localStorage.setItem('cinemaFluxHistory', JSON.stringify(watchHistory));
+            updateHistoryUI();
+
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
@@ -320,27 +264,81 @@
             }
         }
 
-        function searchMovies() {
+        // دالة البث للشاشة الذكية
+        function castToTV() {
+            if (window.CastContext) {
+                var castSession = cast.framework.CastContext.getInstance().getCurrentSession();
+                if (!castSession) {
+                    alert("يرجى التأكد من تشغيل الواي فاي وربط الهاتف بنفس شاشة التلفزيون الذكية!");
+                }
+            } else {
+                // فتح نافذة الطباعة/البث الافتراضية للمتصفحات لدعم الشاشات فوراً
+                window.print();
+            }
+        }
+
+        // تحديث واجهة السجل وحذف عناصر بشكل منفرد أو كلي
+        function updateHistoryUI() {
+            const listContainer = document.getElementById('historyList');
+            const section = document.getElementById('historySection');
+            if (watchHistory.length === 0) {
+                section.style.display = "none";
+                return;
+            }
+            section.style.display = "block";
+            listContainer.innerHTML = "";
+            watchHistory.forEach((item, index) => {
+                listContainer.innerHTML += `
+                    <div class="history-item">
+                        <span class="delete-item-btn" onclick="deleteHistoryItem(${index}, event)">✕</span>
+                        <span onclick="playItem('${item.title}', '${item.desc}', '${item.hdLink}', '${item.sdLink}', '${item.type}')">${item.title}</span>
+                    </div>
+                `;
+            });
+        }
+
+        function deleteHistoryItem(index, event) {
+            event.stopPropagation();
+            watchHistory.splice(index, 1);
+            localStorage.setItem('cinemaFluxHistory', JSON.stringify(watchHistory));
+            updateHistoryUI();
+        }
+
+        function clearFullHistory() {
+            watchHistory = [];
+            localStorage.removeItem('cinemaFluxHistory');
+            updateHistoryUI();
+        }
+
+        // دالة البحث والفرز بين خانة الأفلام وخانة المسلسلات مع رسالة الخطأ المحددة
+        function searchItems() {
             let input = document.getElementById('searchInput').value.trim().toLowerCase();
             let cards = document.getElementsByClassName('movie-card');
-            let foundAny = false;
+            let movieFound = false, seriesFound = false;
             
             for (let i = 0; i < cards.length; i++) {
                 let name = cards[i].getElementsByClassName('movie-name')[0].innerText.toLowerCase();
+                let type = cards[i].getAttribute('data-type');
+                
                 if (name.includes(input)) {
                     cards[i].style.display = "";
-                    foundAny = true;
+                    if (type === 'movie') movieFound = true;
+                    if (type === 'series') seriesFound = true;
                 } else {
                     cards[i].style.display = "none";
                 }
             }
 
+            // التحكم بظهور الخانات أو رسالة الخطأ الطويلة المحددة
+            document.getElementById('moviesBlock').style.display = movieFound ? "block" : "none";
+            document.getElementById('seriesBlock').style.display = seriesFound ? "block" : "none";
+            
             let msg = document.getElementById('noResultsMessage');
-            msg.style.display = foundAny ? "none" : "block";
+            msg.style.display = (!movieFound && !seriesFound) ? "block" : "none";
         }
 
         document.getElementById('searchInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') { searchMovies(); }
+            if (e.key === 'Enter') { searchItems(); }
         });
     </script>
 </body>
