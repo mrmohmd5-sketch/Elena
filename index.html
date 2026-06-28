@@ -3,78 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سينما فلوكس | CinemaFlux - منصة المشاهدة الاحترافية</title>
+    <title>سينما فلوكس | CinemaFlux</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #111111;
+            background-color: #0b1116;
             color: #ffffff;
             margin: 0;
             padding: 0;
+            padding-bottom: 30px;
         }
         header {
-            background-color: #000000;
+            background-color: #06090c;
             padding: 15px;
             text-align: center;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: bold;
             color: #e50914;
-            border-bottom: 3px solid #e50914;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            border-bottom: 1px solid #1c252d;
         }
         .container {
             max-width: 1000px;
-            margin: 20px auto;
+            margin: 0 auto;
             padding: 0 15px;
         }
+        
         /* خانة وزر البحث المطور */
         .search-box {
-            margin-bottom: 25px;
+            margin: 20px auto;
             display: flex;
             justify-content: center;
             gap: 10px;
-            width: 100%;
             max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
         }
         .search-box input {
             flex: 1;
             padding: 12px 20px;
-            font-size: 16px;
-            border: 1px solid #333;
+            font-size: 15px;
+            border: 1px solid #1c252d;
             border-radius: 25px;
-            background-color: #222;
+            background-color: #121b22;
             color: #fff;
             outline: none;
             text-align: right;
-            transition: 0.3s;
         }
         .search-box input:focus {
             border-color: #e50914;
-            box-shadow: 0 0 8px rgba(229, 9, 20, 0.5);
         }
         .search-btn {
             background-color: #e50914;
             color: white;
             border: none;
             padding: 0 25px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             border-radius: 25px;
             cursor: pointer;
-            transition: 0.2s;
         }
-        .search-btn:hover {
-            background-color: #b80710;
-        }
-        /* مشغل الفيديو */
+
+        /* المشغل الرئيسي المتطور */
         .main-player {
             background-color: #000;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.7);
             margin-bottom: 25px;
+            border: 1px solid #1c252d;
+            display: none; /* يظهر فقط عند تشغيل فيلم */
         }
         .video-container {
             position: relative;
@@ -83,144 +77,210 @@
         }
         .video-container iframe {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: 0;
+            top: 0; left: 0; width: 100%; height: 100%; border: 0;
         }
-        /* أزرار السيرفرات والجودة */
         .server-buttons {
-            display: flex;
-            gap: 10px;
-            padding: 10px 15px;
-            background-color: #181818;
-            border-top: 1px solid #252525;
-            justify-content: center;
+            display: flex; gap: 10px; padding: 10px; background-color: #06090c; justify-content: center;
         }
         .server-btn {
-            background-color: #333;
-            color: #fff;
+            background-color: #121b22; color: #fff; border: 1px solid #1c252d; padding: 8px 16px; font-size: 13px; border-radius: 5px; cursor: pointer;
+        }
+        .server-btn.active { background-color: #e50914; border-color: #e50914; }
+        .video-details { padding: 15px; background-color: #06090c; }
+        .video-title { font-size: 18px; margin: 0 0 5px 0; }
+        .video-desc { font-size: 13px; color: #9aa6b1; margin: 0; line-height: 1.5; }
+
+        /* بنر العرض العلوي الكبير (مثل الصورة) */
+        .hero-banner {
+            position: relative;
+            width: 100%;
+            height: 220px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            background-image: linear-gradient(to top, #0b1116 10%, transparent 90%), url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: flex-end;
+            border: 1px solid #1c252d;
+        }
+        .hero-content {
+            padding: 20px;
+            width: 100%;
+        }
+        .hero-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 0 0 10px 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+        .hero-btn {
+            background-color: #e50914;
+            color: white;
             border: none;
-            padding: 8px 16px;
+            padding: 8px 20px;
             font-size: 14px;
             font-weight: bold;
-            border-radius: 5px;
+            border-radius: 20px;
             cursor: pointer;
-            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
-        .server-btn.active, .server-btn:hover {
-            background-color: #e50914;
+
+        /* أقسام العرض الأفقية المتطورة (التمرير يميناً ويساراً للهواتف) */
+        .row-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 25px 0 12px 0;
         }
-        .video-details {
-            padding: 20px;
-            background-color: #181818;
-        }
-        .video-title {
-            font-size: 22px;
-            margin: 0 0 10px 0;
+        .row-title {
+            font-size: 18px;
+            font-weight: bold;
             color: #fff;
         }
-        .video-desc {
-            font-size: 14px;
-            color: #b3b3b3;
-            line-height: 1.6;
-            margin: 0;
+        .row-more {
+            font-size: 13px;
+            color: #9aa6b1;
+            text-decoration: none;
         }
-        /* شبكة عرض الأفلام */
-        .section-title {
-            font-size: 20px;
-            margin: 30px 0 15px 0;
-            border-right: 4px solid #e50914;
-            padding-right: 10px;
+        .movies-slider {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scroll-behavior: smooth;
         }
-        .movies-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 15px;
+        /* إخفاء شريط التمرير الافتراضي لشكل أجمل */
+        .movies-slider::-webkit-scrollbar {
+            height: 4px;
         }
+        .movies-slider::-webkit-scrollbar-thumb {
+            background-color: #1c252d;
+            border-radius: 10px;
+        }
+        
+        /* كارت الفيلم بتصميم سينمانا */
         .movie-card {
-            background-color: #1a1a1a;
+            min-width: 130px;
+            max-width: 130px;
+            background-color: transparent;
+            cursor: pointer;
+        }
+        .poster-wrapper {
+            position: relative;
+            width: 100%;
+            height: 185px;
             border-radius: 8px;
             overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            border: 1px solid #252525;
-        }
-        .movie-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(229,9,20,0.3);
+            border: 1px solid #1c252d;
         }
         .movie-poster {
             width: 100%;
-            height: 200px;
+            height: 100%;
             object-fit: cover;
-            background-color: #333;
         }
         .movie-info {
-            padding: 10px;
-            text-align: center;
+            padding: 6px 0;
         }
         .movie-name {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
-            margin: 0;
+            margin: 0 0 4px 0;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        /* رسالة عدم وجود نتائج */
+        .movie-meta {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            color: #9aa6b1;
+        }
+        .imdb-badge {
+            background-color: #1c252d;
+            color: #fff;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 10px;
+        }
+
         .no-results {
             display: none;
             text-align: center;
             padding: 20px;
-            color: #b3b3b3;
-            font-size: 16px;
+            color: #9aa6b1;
         }
     </style>
 </head>
 <body>
 
-    <header>🍿 سـينما فـلوكس | CinemaFlux</header>
+    <header>🎬 سينما فلوكس | CinemaFlux</header>
 
     <div class="container">
         
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="ابحث عن اسم الفيلم بالعربي أو الإنجليزي...">
+            <input type="text" id="searchInput" placeholder="ابحث عن اسم الفيلم...">
             <button class="search-btn" onclick="searchMovies()">بحث</button>
         </div>
 
-        <div class="main-player">
+        <div class="main-player" id="videoPlayerSection">
             <div class="video-container">
-                <iframe id="mainIframe" src="https://playmogo.com/e/yuj41p7m9e3e" allowfullscreen="true" scrolling="no"></iframe>
+                <iframe id="mainIframe" src="" allowfullscreen="true" scrolling="no"></iframe>
             </div>
             <div class="server-buttons">
-                <button class="server-btn active" id="btnHD" onclick="changeServer('HD')">سيرفر HD (رئيسي)</button>
+                <button class="server-btn active" id="btnHD" onclick="changeServer('HD')">سيرفر عالي الجودة</button>
                 <button class="server-btn" id="btnSD" onclick="changeServer('SD')">سيرفر إنترنت ضعيف</button>
             </div>
             <div class="video-details">
-                <h1 id="currentTitle" class="video-title">فيلم Onward مدبلج</h1>
-                <p id="currentDesc" class="video-desc">قصة شقيقين من القزم يشرعان في رحلة استكشافية لمعرفة ما إذا كان لا يزال هناك بعض السحر المتبقي في العالم لقضاء يوم أخير مع والدهما الراحل.</p>
+                <h1 id="currentTitle" class="video-title">-</h1>
+                <p id="currentDesc" class="video-desc">-</p>
             </div>
         </div>
 
-        <div class="section-title">أحدث الإضافات والأفلام</div>
-        
+        <div class="hero-banner" id="heroBanner">
+            <div class="hero-content">
+                <div class="hero-title">فيلم Onward مدبلج</div>
+                <button class="hero-btn" onclick="playMovie('فيلم Onward مدبلج', 'قصة شقيقين من القزم يشرعان في رحلة استكشافية لمعرفة ما إذا كان لا يزال هناك بعض السحر المتبقي في العالم لقضاء يوم أخير مع والدهما الراحل.', 'https://playmogo.com/e/yuj41p7m9e3e', 'https://playmogo.com/e/yuj41p7m9e3e')">🎬 شاهد الآن</button>
+            </div>
+        </div>
+
         <div id="noResultsMessage" class="no-results">عذراً، لم نجد أي فيلم بهذا الاسم! 🔍</div>
 
-        <div class="movies-grid" id="moviesGrid">
+        <div class="row-header">
+            <div class="row-title">أحدث الأفلام المضافة</div>
+            <a href="#" class="row-more">المزيد</a>
+        </div>
+        
+        <div class="movies-slider" id="moviesSlider1">
             
             <div class="movie-card" onclick="playMovie('فيلم Onward مدبلج', 'قصة شقيقين من القزم يشرعان في رحلة استكشافية لمعرفة ما إذا كان لا يزال هناك بعض السحر المتبقي في العالم لقضاء يوم أخير مع والدهما الراحل.', 'https://playmogo.com/e/yuj41p7m9e3e', 'https://playmogo.com/e/yuj41p7m9e3e')">
-                <img class="movie-poster" src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400" alt="Onward">
+                <div class="poster-wrapper">
+                    <img class="movie-poster" src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400" alt="Onward">
+                </div>
                 <div class="movie-info">
                     <p class="movie-name">Onward مدبلج</p>
+                    <div class="movie-meta">
+                        <span class="imdb-badge">7.4</span>
+                        <span>انيميشن, دبلجة</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="movie-card" onclick="playMovie('فيلم الأكشن والتحدي التجريبي', 'وصف تجريبي للفيلم الثاني لرؤية ميزة الانتقال السريع بين الأفلام.', 'https://playmogo.com/e/your_second_video_id', 'https://playmogo.com/e/your_second_video_id')">
-                <img class="movie-poster" src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400" alt="فيلم تجريبي">
+            <div class="movie-card" onclick="playMovie('فيلم تجريبي 2', 'هذا وصف للفيلم التجريبي الثاني المضاف للتأكد من ميزة التمرير الأفقي.', 'https://playmogo.com/e/your_second_id', 'https://playmogo.com/e/your_second_id')">
+                <div class="poster-wrapper">
+                    <img class="movie-poster" src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400" alt="تجريبي">
+                </div>
                 <div class="movie-info">
                     <p class="movie-name">فيلم تجريبي 2</p>
+                    <div class="movie-meta">
+                        <span class="imdb-badge">8.0</span>
+                        <span>أكشن, إثارة</span>
+                    </div>
                 </div>
             </div>
 
@@ -229,10 +289,13 @@
     </div>
 
     <script>
-        let currentHD = "https://playmogo.com/e/yuj41p7m9e3e";
-        let currentSD = "https://playmogo.com/e/yuj41p7m9e3e"; 
+        let currentHD = "";
+        let currentSD = ""; 
 
         function playMovie(title, desc, hdLink, sdLink) {
+            // إظهار قسم المشغل
+            document.getElementById('videoPlayerSection').style.display = "block";
+            
             document.getElementById('currentTitle').innerText = title;
             document.getElementById('currentDesc').innerText = desc;
             currentHD = hdLink;
@@ -257,7 +320,6 @@
             }
         }
 
-        // دالة البحث المحدثة والذكية (تحل مشكلة الحروف الكبيرة والصغيرة وتدعم زر البحث)
         function searchMovies() {
             let input = document.getElementById('searchInput').value.trim().toLowerCase();
             let cards = document.getElementsByClassName('movie-card');
@@ -265,8 +327,6 @@
             
             for (let i = 0; i < cards.length; i++) {
                 let name = cards[i].getElementsByClassName('movie-name')[0].innerText.toLowerCase();
-                
-                // هنا الكود أصبح ذكياً: يبحث إذا كان النص المكتوب جزءاً من الاسم بأي شكل
                 if (name.includes(input)) {
                     cards[i].style.display = "";
                     foundAny = true;
@@ -275,20 +335,12 @@
                 }
             }
 
-            // إظهار رسالة تنبيه لو لم يجد الفيلم
             let msg = document.getElementById('noResultsMessage');
-            if (foundAny) {
-                msg.style.display = "none";
-            } else {
-                msg.style.display = "block";
-            }
+            msg.style.display = foundAny ? "none" : "block";
         }
 
-        // لجعل زر الـ Enter في لوحة مفاتيح الهاتف يقوم بالبحث أيضاً تلقائياً
         document.getElementById('searchInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                searchMovies();
-            }
+            if (e.key === 'Enter') { searchMovies(); }
         });
     </script>
 </body>
