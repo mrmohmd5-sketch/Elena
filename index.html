@@ -6,43 +6,41 @@
     <title>سينما فلوكس | CinemaFlux</title>
     <style>
         :root {
-            --bg-main: #0b1116;
-            --bg-dark: #06090c;
-            --bg-card: #121b22;
+            --bg-color: #0b1116;
+            --card-bg: #06090c;
             --border-color: #1c252d;
-            --primary: #e50914;
-            --text-main: #ffffff;
+            --primary-color: #e50914;
+            --text-color: #ffffff;
             --text-muted: #9aa6b1;
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-main);
-            color: var(--text-main);
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0; padding: 0; padding-bottom: 40px;
+            user-select: none;
         }
         
-        /* شريط التحكم العلوي وزر تغيير اللغة */
-        .top-bar {
-            background-color: var(--bg-dark);
-            padding: 10px 15px;
+        /* شريط التنقل العلوي مع مغير اللغة المتطور */
+        header {
+            background-color: var(--card-bg);
+            padding: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border-color);
+            position: relative;
         }
-        .lang-btn {
-            background-color: var(--bg-card);
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            padding: 5px 12px;
-            font-size: 12px;
-            border-radius: 15px;
-            cursor: pointer;
-            font-weight: bold;
+        .logo {
+            font-size: 20px; font-weight: bold; color: var(--primary-color); margin: 0 auto;
         }
-        .site-logo {
-            font-size: 20px; font-weight: bold; color: var(--primary); margin: 0;
+        .lang-switcher {
+            position: absolute; right: 15px; top: 18px;
+            font-size: 12px; display: flex; gap: 8px; background: #121b22;
+            padding: 4px 10px; border-radius: 15px; border: 1px solid var(--border-color);
         }
+        .lang-btn { cursor: pointer; color: var(--text-muted); transition: 0.2s; font-weight: bold; }
+        .lang-btn.active { color: var(--primary-color); text-decoration: underline; }
 
         .container { max-width: 1000px; margin: 0 auto; padding: 0 15px; }
         
@@ -50,299 +48,269 @@
         .search-box { margin: 20px auto; display: flex; justify-content: center; gap: 10px; max-width: 600px; }
         .search-box input {
             flex: 1; padding: 12px 20px; font-size: 15px; border: 1px solid var(--border-color);
-            border-radius: 25px; background-color: var(--bg-card); color: #fff; outline: none;
+            border-radius: 25px; background-color: #121b22; color: #fff; outline: none;
         }
-        body[dir="rtl"] .search-box input { text-align: right; }
-        body[dir="ltr"] .search-box input { text-align: left; }
-        .search-box input:focus { border-color: var(--primary); }
         .search-btn {
-            background-color: var(--primary); color: white; border: none;
+            background-color: var(--primary-color); color: white; border: none;
             padding: 0 25px; font-size: 15px; font-weight: bold; border-radius: 25px; cursor: pointer;
         }
 
-        /* المشغل الرئيسي الافتراضي */
-        .main-player {
-            background-color: #000; border-radius: 12px; overflow: hidden; margin-bottom: 25px;
-            border: 1px solid var(--border-color); display: none;
-        }
-        .video-container { position: relative; padding-bottom: 56.25%; height: 0; }
-        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-        .player-controls { display: flex; gap: 10px; padding: 10px; background-color: var(--bg-dark); justify-content: center; }
-        .server-btn {
-            background-color: var(--bg-card); color: #fff; border: 1px solid var(--border-color);
-            padding: 8px 16px; font-size: 13px; border-radius: 5px; cursor: pointer;
-        }
-        .server-btn.active { background-color: var(--primary); border-color: var(--primary); }
-
-        /* ==================== واجهة تفاصيل المسلسل (سينمانا) ==================== */
-        .details-view { display: none; margin-bottom: 30px; }
-        .hero-details-banner {
-            position: relative; width: 100%; height: 260px; border-radius: 12px; overflow: hidden;
-            background-size: cover; background-position: center; display: flex; align-items: flex-end;
-            border: 1px solid var(--border-color); margin-bottom: 20px;
-        }
-        .hero-details-overlay {
-            padding: 20px; width: 100%; background: linear-gradient(to top, var(--bg-main) 15%, transparent 100%);
-        }
-        .details-title { font-size: 24px; font-weight: bold; margin: 0 0 8px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.9); }
-        .details-meta { display: flex; gap: 10px; font-size: 13px; color: var(--text-muted); margin-bottom: 10px; align-items: center; }
-        .details-desc { font-size: 14px; color: #cbd5e1; line-height: 1.6; margin: 0; }
-        
-        /* تبويب المواسم */
-        .seasons-tabs { display: flex; gap: 10px; margin: 20px 0; overflow-x: auto; padding-bottom: 5px; }
-        .season-tab-btn {
-            background-color: transparent; color: var(--text-main); border: 2px solid var(--border-color);
-            padding: 6px 20px; border-radius: 20px; font-size: 14px; font-weight: bold; cursor: pointer; white-space: nowrap;
-        }
-        .season-tab-btn.active { background-color: var(--bg-card); border-color: var(--text-main); }
-
-        /* قائمة الحلقات الرأسية (سينمانا) */
-        .episodes-list { display: flex; flex-direction: column; gap: 12px; }
-        .episode-row {
-            display: flex; background-color: var(--bg-dark); border-radius: 8px; overflow: hidden;
-            border: 1px solid var(--border-color); cursor: pointer; align-items: center; padding-left: 15px;
-        }
-        .ep-thumb-wrapper { position: relative; width: 120px; height: 75px; flex-shrink: 0; background-color: #000; }
-        .ep-thumb { width: 100%; height: 100%; object-fit: cover; }
-        .ep-play-overlay {
-            position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.4);
-            display: flex; justify-content: center; align-items: center;
-        }
-        .ep-play-icon { width: 26px; height: 26px; background-color: var(--primary); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 12px; }
-        .ep-info { padding: 10px 15px; flex: 1; }
-        .ep-title { font-size: 14px; font-weight: bold; margin: 0 0 5px 0; }
-        .ep-duration { font-size: 11px; color: var(--text-muted); }
-
-        /* البانر الرئيسي المتحرك */
-        .carousel-container { position: relative; width: 100%; height: 220px; border-radius: 12px; overflow: hidden; margin-bottom: 25px; border: 1px solid var(--border-color); }
+        /* البانر العلوي المتحرك */
+        .carousel-container { position: relative; width: 100%; height: 200px; border-radius: 12px; overflow: hidden; margin-bottom: 25px; border: 1px solid var(--border-color); }
         .carousel-track { display: flex; width: 100%; height: 100%; transition: transform 0.5s ease-in-out; }
         .carousel-slide { min-width: 100%; height: 100%; position: relative; background-size: cover; background-position: center; display: flex; align-items: flex-end; }
-        .carousel-content { padding: 20px; width: 100%; background: linear-gradient(to top, var(--bg-main) 20%, transparent 100%); }
-        .hero-title { font-size: 22px; font-weight: bold; margin: 0 0 10px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
-        .hero-btn { background-color: var(--primary); color: white; border: none; padding: 8px 20px; font-size: 14px; font-weight: bold; border-radius: 20px; cursor: pointer; }
+        .carousel-content { padding: 20px; width: 100%; background: linear-gradient(to top, #0b1116 20%, transparent 100%); }
+        .hero-title { font-size: 20px; font-weight: bold; margin: 0 0 10px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .hero-btn { background-color: var(--primary-color); color: white; border: none; padding: 6px 16px; font-size: 13px; font-weight: bold; border-radius: 20px; cursor: pointer; }
 
-        /* صفوف العرض الأفقي */
+        /* سجل المشاهدة */
+        .history-section { background-color: var(--card-bg); padding: 15px; border-radius: 8px; margin-bottom: 25px; border: 1px solid var(--border-color); display: none; }
+        .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .clear-all-btn { background-color: #dc3545; color: #fff; border: none; padding: 4px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; }
+        .history-list { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
+        .history-item { position: relative; background-color: #121b22; padding: 8px 30px 8px 10px; border-radius: 5px; font-size: 12px; white-space: nowrap; border: 1px solid var(--border-color); }
+        .delete-item-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); color: #dc3545; cursor: pointer; }
+
+        /* صفوف العرض الممررة */
         .row-header { display: flex; justify-content: space-between; align-items: center; margin: 25px 0 12px 0; }
-        .row-title { font-size: 18px; font-weight: bold; color: #fff; border-right: 4px solid var(--primary); padding-right: 8px; }
-        body[dir="ltr"] .row-title { border-right: none; border-left: 4px solid var(--primary); padding-right: 0; padding-left: 8px; }
+        .row-title { font-size: 17px; font-weight: bold; color: #fff; border-right: 4px solid var(--primary-color); padding-right: 8px; }
+        body.en-mode .row-title { border-right: none; border-left: 4px solid var(--primary-color); padding-right: 0; padding-left: 8px; }
         .movies-slider { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; }
         
-        /* كارت الفيلم */
-        .movie-card { min-width: 130px; max-width: 130px; cursor: pointer; }
-        .poster-wrapper { position: relative; width: 100%; height: 185px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); }
+        /* كارت الفيلم والمسلسل */
+        .movie-card { min-width: 125px; max-width: 125px; cursor: pointer; }
+        .poster-wrapper { position: relative; width: 100%; height: 175px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); }
         .movie-poster { width: 100%; height: 100%; object-fit: cover; }
         .movie-info { padding: 6px 0; }
         .movie-name { font-size: 13px; font-weight: bold; margin: 0 0 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .movie-meta { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-muted); }
-        .imdb-badge { background-color: var(--border-color); color: #fff; padding: 1px 4px; border-radius: 3px; font-weight: bold; font-size: 10px; }
+        .imdb-badge { background-color: #1c252d; color: #fff; padding: 1px 4px; border-radius: 3px; font-weight: bold; font-size: 10px; }
 
-        .no-results {
-            display: none; text-align: center; padding: 30px 15px; color: var(--text-muted); font-size: 14px; line-height: 1.6;
-            background-color: var(--bg-dark); border-radius: 8px; border: 1px solid var(--border-color); margin-top: 20px;
-        }
+        /* رسالة عدم وجود نتائج المتكاملة المخصصة */
+        .no-results { display: none; text-align: center; padding: 30px 15px; color: var(--text-muted); font-size: 14px; line-init: 1.6; background-color: var(--card-bg); border-radius: 8px; border: 1px solid var(--border-color); margin-top: 20px; }
+
+        /* ==================== واجهة العرض والصفحة الداخلية (سينمانا) ==================== */
+        .details-page { display: none; margin-top: 15px; }
+        .back-btn { background-color: #121b22; color: #fff; border: 1px solid var(--border-color); padding: 6px 15px; border-radius: 20px; cursor: pointer; font-size: 13px; margin-bottom: 15px; }
+        
+        /* بنر وتفاصيل المادة */
+        .details-hero { position: relative; width: 100%; height: 240px; border-radius: 12px; overflow: hidden; background-size: cover; background-position: center; border: 1px solid var(--border-color); margin-bottom: 20px; display: flex; align-items: flex-end; }
+        .details-hero-overlay { padding: 20px; width: 100%; background: linear-gradient(to top, #0b1116 30%, transparent 100%); }
+        .details-meta-line { display: flex; gap: 10px; align-items: center; font-size: 12px; color: var(--text-muted); margin: 8px 0; }
+        .details-desc { font-size: 13px; color: #cbd5e1; line-height: 1.6; margin: 10px 0 0 0; }
+
+        /* مشغل الفيديو الداخلي وثواني البث */
+        .player-wrapper { background-color: #000; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); margin-bottom: 20px; display: none; }
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        .player-controls { display: flex; gap: 10px; padding: 10px; background-color: var(--card-bg); justify-content: center; }
+        .server-btn, .cast-btn { background-color: #121b22; color: #fff; border: 1px solid var(--border-color); padding: 6px 14px; font-size: 12px; border-radius: 5px; cursor: pointer; }
+        .server-btn.active { background-color: var(--primary-color); border-color: var(--primary-color); }
+        .cast-btn { background-color: #28a745; border-color: #28a745; }
+
+        /* تبويب المواسم والحلقات (تطبيق سينمانا بدقة) */
+        .seasons-tabs { display: flex; gap: 10px; overflow-x: auto; margin: 20px 0; padding-bottom: 5px; }
+        .season-tab-btn { background-color: #121b22; color: #fff; border: 1px solid var(--border-color); padding: 6px 18px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: bold; white-space: nowrap; }
+        .season-tab-btn.active { background-color: var(--text-color); color: #000; border-color: var(--text-color); }
+
+        .episodes-list { display: flex; flex-direction: column; gap: 12px; }
+        .episode-row { display: flex; align-items: center; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; cursor: pointer; transition: 0.2s; gap: 12px; }
+        .episode-row:hover { background-color: #121b22; }
+        .ep-thumb-container { position: relative; width: 90px; height: 55px; border-radius: 4px; overflow: hidden; background-color: #333; flex-shrink: 0; }
+        .ep-thumb { width: 100%; height: 100%; object-fit: cover; }
+        .ep-play-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(229,9,20,0.9); color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+        .ep-details { flex: 1; }
+        .ep-title { font-size: 13px; font-weight: bold; margin: 0 0 4px 0; }
+        .ep-time { font-size: 11px; color: var(--text-muted); }
     </style>
 </head>
 <body>
 
-    <div class="top-bar">
-        <button class="lang-btn" id="langBtn" onclick="toggleLanguage()">English</button>
-        <div class="site-logo" id="logoText">🍿 سينما فلوكس</div>
-    </div>
+    <header>
+        <div class="lang-switcher">
+            <span class="lang-btn active" id="btnAr" onclick="switchLanguage('ar')">العربية</span>
+            <span style="color: #333;">|</span>
+            <span class="lang-btn" id="btnEn" onclick="switchLanguage('en')">English</span>
+        </div>
+        <div class="logo">🍿 CinemaFlux</div>
+    </header>
 
     <div class="container">
         
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="ابحث عن اسم الفيلم أو المسلسل...">
-            <button class="search-btn" id="searchBtn" onclick="searchItems()">بحث</button>
-        </div>
-
-        <div class="main-player" id="videoPlayerSection">
-            <div class="video-container">
-                <iframe id="mainIframe" src="" allowfullscreen="true" scrolling="no"></iframe>
+        <div id="homePage">
+            <div class="search-box">
+                <input type="text" id="searchInput" data-placeholder-ar="ابحث عن اسم الفيلم أو المسلسل..." data-placeholder-en="Search for movies or series..." placeholder="ابحث عن اسم الفيلم أو المسلسل...">
+                <button class="search-btn" id="searchBtnText" onclick="searchItems()">بحث</button>
             </div>
-            <div class="player-controls">
-                <button class="server-btn active" id="btnHD" onclick="changeServer('HD')">سيرفر HD</button>
-                <button class="server-btn" id="btnSD" onclick="changeServer('SD')">سيرفر ضعیف</button>
-            </div>
-        </div>
 
-        <div class="details-view" id="detailsView">
-            <div class="hero-details-banner" id="detailsBanner">
-                <div class="hero-details-overlay">
-                    <h1 class="details-title" id="detTitle">اسم العمل</h1>
-                    <div class="details-meta" id="detMeta"></div>
-                    <p class="details-desc" id="detDesc">الوصف والقصة...</p>
+            <div class="history-section" id="historySection">
+                <div class="history-header">
+                    <div class="row-title" id="historyTitleText" style="border-right-color: #28a745;">سجل المشاهدة مؤخراً</div>
+                    <button class="clear-all-btn" id="clearHistoryBtnText" onclick="clearFullHistory()">حذف السجل بالكامل 🗑️</button>
+                </div>
+                <div class="history-list" id="historyList"></div>
+            </div>
+
+            <div class="carousel-container" id="heroCarousel">
+                <div class="carousel-track" id="carouselTrack">
+                    <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800');">
+                        <div class="carousel-content">
+                            <div class="hero-title">فيلم Onward مدبلج</div>
+                            <button class="hero-btn watch-now-text" onclick="openDetailsPage('onward')">🎬 شاهد الآن</button>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <div id="noResultsMessage" class="no-results" 
+                 data-msg-ar="عذراً لا توجد نتائج ، قم بأدخال كلمات مختلفة او ربما انت قمت بكتابة الاسم بشكل غير صحيح 🔍"
+                 data-msg-en="Sorry, no results found. Please enter different words or maybe you spelled the name incorrectly 🔍">
+                 عذراً لا توجد نتائج ، قم بأدخال كلمات مختلفة او ربما انت قمت بكتابة الاسم بشكل غير صحيح 🔍
+            </div>
+
+            <div id="moviesBlock">
+                <div class="row-header"><div class="row-title" id="moviesRowTitle">قسم الأفلام</div></div>
+                <div class="movies-slider" id="moviesSlider">
+                    <div class="movie-card" data-title="onward" onclick="openDetailsPage('onward')">
+                        <div class="poster-wrapper"><img class="movie-poster" src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400"></div>
+                        <div class="movie-info">
+                            <p class="movie-name">Onward مدبلج</p>
+                            <div class="movie-meta"><span class="imdb-badge">7.4</span><span class="genre-text-animation">انيميشن</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="seriesBlock">
+                <div class="row-header"><div class="row-title" id="seriesRowTitle">قسم المسلسلات</div></div>
+                <div class="movies-slider" id="seriesSlider">
+                    <div class="movie-card" data-title="hotd" onclick="openDetailsPage('hotd')">
+                        <div class="poster-wrapper"><img class="movie-poster" src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400"></div>
+                        <div class="movie-info">
+                            <p class="movie-name">House of the Dragon</p>
+                            <div class="movie-meta"><span class="imdb-badge">8.5</span><span>دراما, مغامرة</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="detailsPage" class="details-page">
+            <button class="back-btn" id="backBtnText" onclick="backToHome()">⬅️ العودة للرئيسية</button>
             
-            <div class="seasons-tabs" id="seasonsTabs"></div>
-            
-            <div id="detailsContentSection">
-                <div class="row-title" id="contentSectionTitle" style="margin-bottom:15px;">الحلقات</div>
-                <div class="episodes-list" id="episodesList"></div>
-                <div class="movies-slider" id="suggestionsSlider" style="display:none;"></div>
-            </div>
-        </div>
-
-        <div class="carousel-container" id="heroCarousel">
-            <div class="carousel-track" id="carouselTrack">
-                <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800');">
-                    <div class="carousel-content">
-                        <div class="hero-title">Onward مدبلج</div>
-                        <button class="hero-btn" onclick="openMovie('Onward مدبلج', 'قصة شقيقين من القزم يشرعان في رحلة استكشافية لمعرفة ما إذا كان لا يزال هناك بعض السحر المتبقي في العالم لقضاء يوم أخير مع والدهما الراحل.', 'https://playmogo.com/e/yuj41p7m9e3e', 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800', '7.4', 'انيميشن')">شاهد الآن</button>
-                    </div>
+            <div class="player-wrapper" id="playerWrapperBlock">
+                <div class="video-container">
+                    <iframe id="mainIframe" src="" allowfullscreen="true" scrolling="no"></iframe>
+                </div>
+                <div class="player-controls">
+                    <button class="server-btn active" id="btnHD" onclick="changeServer('HD')">HD</button>
+                    <button class="server-btn" id="btnSD" onclick="changeServer('SD')">SD</button>
+                    <button class="cast-btn" id="castBtnText" onclick="window.print()">📺 بث للشاشة</button>
                 </div>
             </div>
-        </div>
 
-        <div id="noResultsMessage" class="no-results">عذراً لا توجد نتائج ، قم بأدخال كلمات مختلفة او ربما انت قمت بكتابة الاسم بشكل غير صحيح 🔍</div>
-
-        <div id="moviesBlock">
-            <div class="row-header"><div class="row-title" id="headingMovies">قسم الأفلام</div></div>
-            <div class="movies-slider">
-                <div class="movie-card" data-type="movie" onclick="openMovie('Onward مدبلج', 'قصة شقيقين من القزم يشرعان في رحلة استكشافية لمعرفة ما إذا كان لا يزال هناك بعض السحر المتبقي في العالم لقضاء يوم أخير مع والدهما الراحل.', 'https://playmogo.com/e/yuj41p7m9e3e', 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400', '7.4', 'انيميشن')">
-                    <div class="poster-wrapper"><img class="movie-poster" src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400"></div>
-                    <div class="movie-info">
-                        <p class="movie-name">Onward مدبلج</p>
-                        <div class="movie-meta"><span class="imdb-badge">7.4</span><span>انيميشن</span></div>
+            <div class="details-hero" id="detailsHeroBanner">
+                <div class="details-hero-overlay">
+                    <h1 class="hero-title" id="detailsTitle">-</h1>
+                    <div class="details-meta-line">
+                        <span class="imdb-badge" id="detailsImdb">-</span>
+                        <span id="detailsMetaSub">-</span>
                     </div>
+                    <p class="details-desc" id="detailsDescription">-</p>
                 </div>
             </div>
-        </div>
 
-        <div id="seriesBlock">
-            <div class="row-header"><div class="row-title" id="headingSeries">قسم المسلسلات</div></div>
-            <div class="movies-slider">
-                <div class="movie-card" data-type="series" onclick="openSeries('House of the Dragon', 'تدور الأحداث قبل 300 عام من أحداث المسلسل الأصلي، حيث سيركز على تفاصيل عائلة آل تارجارين ولمحات هامة في تاريخ العائلة.', 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800', '8.5', 'أكشن, مغامرة', '2022')">
-                    <div class="poster-wrapper"><img class="movie-poster" src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400"></div>
-                    <div class="movie-info">
-                        <p class="movie-name">House of the Dragon</p>
-                        <div class="movie-meta"><span class="imdb-badge">8.5</span><span>أكشن, مغامرة</span></div>
-                    </div>
-                </div>
+            <div id="seriesContentBlock">
+                <div class="row-title" id="episodesTitleText">الحلقات والمواسم</div>
+                <div class="seasons-tabs" id="seasonsTabsContainer"></div>
+                <div class="episodes-list" id="episodesListContainer"></div>
+            </div>
+
+            <div id="movieContentBlock">
+                <div class="row-header"><div class="row-title" id="suggestionsTitleText">أفلام قد تعجبك (اقتراحات مشابهة)</div></div>
+                <div class="movies-slider" id="suggestionsSliderContainer"></div>
             </div>
         </div>
 
     </div>
 
     <script>
-        let currentHD = "", currentSD = "";
-        let currentLang = "ar";
-
-        // بيانات الترجمة للواجهة بالكامل
-        const translations = {
-            ar: {
-                logo: "🍿 سينما فلوكس", langBtn: "English", placeholder: "ابحث عن اسم الفيلم أو المسلسل...",
-                searchBtn: "بحث", moviesHead: "قسم الأفلام", seriesHead: "قسم المسلسلات",
-                episodes: "الحلقات", suggested: "أفلام مقترحة قد تعجبك",
-                errorMsg: "عذراً لا توجد نتائج ، قم بأدخال كلمات مختلفة او ربما انت قمت بكتابة الاسم بشكل غير صحيح 🔍"
+        // قاعدة البيانات المتكاملة للأفلام والمسلسلات والمواسم والحلقات
+        const database = {
+            onward: {
+                type: 'movie',
+                titleAr: 'فيلم Onward مدبلج', titleEn: 'Onward (Arabic Dubbed)',
+                descAr: 'قصة شقيقين من القزم يشرعان في رحلة استكشافية لمعرفة ما إذا كان لا يزال هناك بعض السحر المتبقي في العالم لقضاء يوم أخير مع والدهما الراحل.',
+                descEn: 'Two elven brothers embark on a quest to discover if there is still a little magic left out there in order to spend one last day with their father.',
+                imdb: '7.4', metaAr: '2020 • انيميشن, مغامرة', metaEn: '2020 • Animation, Adventure',
+                banner: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800',
+                hdLink: 'https://playmogo.com/e/yuj41p7m9e3e', sdLink: 'https://playmogo.com/e/yuj41p7m9e3e'
             },
-            en: {
-                logo: "🍿 CinemaFlux", langBtn: "العربية", placeholder: "Search movies or series...",
-                searchBtn: "Search", moviesHead: "Movies Section", seriesHead: "Series Section",
-                episodes: "Episodes", suggested: "Recommended Movies For You",
-                errorMsg: "Sorry, no results found. Please enter different words or check your spelling! 🔍"
+            hotd: {
+                type: 'series',
+                titleAr: 'مسلسل House of the Dragon', titleEn: 'House of the Dragon',
+                descAr: 'تدور الأحداث قبل 300 عام من أحداث المسلسل الأصلي، حيث تتركز على تفاصيل عائلة آل تارجارين ولمحات هامة في تاريخ العائلة التي حكمت ويستروس.',
+                descEn: 'An internal succession war within House Targaryen at the height of its power, 172 years before the birth of Daenerys Targaryen.',
+                imdb: '8.5', metaAr: '2022 • اكشن, مغامرة • س 5 و د', metaEn: '2022 • Action, Adventure • TV-MA',
+                banner: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800',
+                seasons: [
+                    {
+                        nameAr: 'الموسم 1', nameEn: 'Season 1',
+                        episodes: [
+                            { titleAr: 'الحلقة 1: وريث التنين', titleEn: 'Episode 1: Heirs of the Dragon', link: 'https://playmogo.com/e/yuj41p7m9e3e', time: '60 min' },
+                            { titleAr: 'الحلقة 2: الأمير المارق', titleEn: 'Episode 2: The Rogue Prince', link: 'https://playmogo.com/e/yuj41p7m9e3e', time: '54 min' }
+                        ]
+                    },
+                    {
+                        nameAr: 'الموسم 2', nameEn: 'Season 2',
+                        episodes: [
+                            { titleAr: 'الحلقة 1: ابن عاقل', titleEn: 'Episode 1: A Son for a Son', link: 'https://playmogo.com/e/yuj41p7m9e3e', time: '59 min' }
+                        ]
+                    }
+                ]
             }
         };
 
-        function toggleLanguage() {
-            currentLang = currentLang === "ar" ? "en" : "ar";
-            document.documentElement.lang = currentLang;
-            document.body.dir = currentLang === "ar" ? "rtl" : "ltr";
-            
-            document.getElementById('langBtn').innerText = translations[currentLang].langBtn;
-            document.getElementById('logoText').innerText = translations[currentLang].logo;
-            document.getElementById('searchInput').placeholder = translations[currentLang].placeholder;
-            document.getElementById('searchBtn').innerText = translations[currentLang].searchBtn;
-            document.getElementById('headingMovies').innerText = translations[currentLang].moviesHead;
-            document.getElementById('headingSeries').innerText = translations[currentLang].seriesHead;
-            document.getElementById('noResultsMessage').innerText = translations[currentLang].errorMsg;
-            
-            const epTitle = document.getElementById('contentSectionTitle');
-            if (epTitle.getAttribute('data-type') === 'movie') {
-                epTitle.innerText = translations[currentLang].suggested;
-            } else {
-                epTitle.innerText = translations[currentLang].episodes;
+        // النصوص والمصطلحات المترجمة للواجهة بالكامل
+        const translations = {
+            ar: {
+                searchBtn: 'بحث', moviesRow: 'قسم الأفلام', seriesRow: 'قسم المسلسلات',
+                backBtn: '⬅️ العودة للرئيسية', castBtn: '📺 بث للشاشة', episodesTitle: 'الحلقات والمواسم',
+                suggestionsTitle: 'أفلام قد تعجبك (اقتراحات مشابهة)', historyTitle: 'سجل المشاهدة مؤخراً',
+                clearHistory: 'حذف السجل بالكامل 🗑️', watchNow: '🎬 شاهد الآن', epText: 'الحلقة'
+            },
+            en: {
+                searchBtn: 'Search', moviesRow: 'Movies Section', seriesRow: 'TV Series Section',
+                backBtn: '⬅️ Back to Home', castBtn: '📺 Cast to TV', episodesTitle: 'Seasons & Episodes',
+                suggestionsTitle: 'Movies You May Like (Suggestions)', historyTitle: 'Recently Watched',
+                clearHistory: 'Clear History 🗑️', watchNow: '🎬 Watch Now', epText: 'Episode'
             }
-        }
+        };
 
-        // تحريك البانر تلقائياً
-        let currentSlide = 0;
-        setInterval(() => {
-            const track = document.getElementById('carouselTrack');
-            const slidesCount = document.querySelectorAll('.carousel-slide').length;
-            if(slidesCount > 1) {
-                currentSlide = (currentSlide + 1) % slidesCount;
-                track.style.transform = `translateX(${currentSlide * 100}%)`;
-            }
-        }, 5000);
+        let currentLang = localStorage.getItem('cinemaFluxLang') || 'ar';
+        let currentItemKey = '';
+        let currentHD = '', currentSD = '';
+        let watchHistory = JSON.parse(localStorage.getItem('cinemaFluxHistory')) || [];
 
-        // ==================== دوال التحكم بالتشغيل والعرض المتطور ====================
-        function openMovie(title, desc, url, poster, rating, genre) {
-            document.getElementById('detailsView').style.display = "block";
-            document.getElementById('detTitle').innerText = title;
-            document.getElementById('detDesc').innerText = desc;
-            document.getElementById('detailsBanner').style.backgroundImage = `linear-gradient(to top, var(--bg-main) 15%, transparent 100%), url('${poster}')`;
-            document.getElementById('detMeta').innerHTML = `<span class="imdb-badge">${rating}</span> <span>${genre}</span>`;
+        // إعداد اللغة والاتجاه والواجهة فور تشغيل الصفحة
+        switchLanguage(currentLang);
+        updateHistoryUI();
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('cinemaFluxLang', lang);
             
-            document.getElementById('seasonsTabs').innerHTML = ""; 
-            document.getElementById('episodesList').style.display = "none";
-            document.getElementById('suggestionsSlider').style.display = "flex";
+            // تحديث مؤشرات اللغات النشطة فوق
+            document.getElementById('btnAr').classList.toggle('active', lang === 'ar');
+            document.getElementById('btnEn').classList.toggle('active', lang === 'en');
             
-            const contentTitle = document.getElementById('contentSectionTitle');
-            contentTitle.setAttribute('data-type', 'movie');
-            contentTitle.innerText = translations[currentLang].suggested;
+            // تغيير اتجاه ولغة الصفحة بالكامل وهيكل الموقع
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            if (lang === 'en') { document.body.classList.add('en-mode'); } else { document.body.classList.remove('en-mode'); }
 
-            // توليد أفلام مقترحة افتراضية
-            document.getElementById('suggestionsSlider').innerHTML = `
-                <div class="movie-card" onclick="playVideo('${title}', '${desc}', '${url}', '${url}')">
-                    <div class="poster-wrapper"><img class="movie-poster" src="${poster}"></div>
-                    <div class="movie-info"><p class="movie-name">${title}</p></div>
-                </div>
-            `;
-            playVideo(title, desc, url, url);
-        }
-
-        function openSeries(title, desc, poster, rating, genre, year) {
-            document.getElementById('detailsView').style.display = "block";
-            document.getElementById('detTitle').innerText = title;
-            document.getElementById('detDesc').innerText = desc;
-            document.getElementById('detailsBanner').style.backgroundImage = `linear-gradient(to top, var(--bg-main) 15%, transparent 100%), url('${poster}')`;
-            document.getElementById('detMeta').innerHTML = `<span class="imdb-badge">${rating}</span> <span>${genre}</span> <span>${year}</span>`;
-            
-            document.getElementById('suggestionsSlider').style.display = "none";
-            document.getElementById('episodesList').style.display = "flex";
-            
-            const contentTitle = document.getElementById('contentSectionTitle');
-            contentTitle.setAttribute('data-type', 'series');
-            contentTitle.innerText = translations[currentLang].episodes;
-
-            // إضافة تبويبات المواسم (الموسم 1 والموسم 2 كمثال مطابق للتصميم)
-            const seasonsTabs = document.getElementById('seasonsTabs');
-            seasonsTabs.innerHTML = `
-                <button class="season-tab-btn active" onclick="loadEpisodes(1, '${title}', '${poster}')">الموسم 1</button>
-                <button class="season-tab-btn" onclick="loadEpisodes(2, '${title}', '${poster}')">الموسم 2</button>
-            `;
-            
-            loadEpisodes(1, title, poster);
-        }
-
-        // تحميل قائمة الحلقات رأسياً مثل "سينمانا" عند الضغط على الموسم
-        function loadEpisodes(seasonNum, seriesTitle, poster) {
-            const tabBtns = document.querySelectorAll('.season-tab-btn');
-            tabBtns.forEach((btn, idx) => {
-                btn.classList.toggle('active', idx === (seasonNum - 1));
-            });
-
-            const epList = document.getElementById('episodesList');
-            epList.innerHTML = "";
-
-            // مثال لحلقتين جاهزتين للعمل
-            const sampleEpisodes = [
-                { epNum: 1, title: `الموسم ${seasonNum} الحلقة 1`, url: "https://playmogo.com/e/yuj41p7m9e3e", duration: "59 دقيقة" },
-                { epNum: 2, title: `الموسم ${seasonNum} الحلقة 2`, url: "https://playmogo.com/e/yuj41p7m9e3e", duration: "55 دقيقة" }
-            ];
-
-            sampleEpisodes.forEach(ep => {
-                epList.innerHTML += `
-                    <div class="episode-row" onclick="playVideo('${seriesTitle}
+            // تبديل الكلمات الثابتة في الموقع بالكامل
+            document.getElementById('searchBtnText').innerText = translations[lang].searchBtn;
+            document.getElementById('moviesRowTitle').innerText = translations[lang].moviesRow;
+            document.getElementById('seriesRowTitle').innerText = translations[lang].seriesRow;
+            document.getElementById('backBtnText
