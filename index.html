@@ -12,24 +12,32 @@
             margin: 0;
             padding: 0;
             padding-bottom: 40px;
-            transition: direction 0.3s ease;
         }
+        
+        /* الهيدر المطور لمنع التداخل وفصل العناصر */
         header {
             background-color: #06090c;
-            padding: 15px;
-            text-align: center;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1c252d;
+            box-sizing: border-box;
+        }
+        
+        /* إزاحة الشعار مع الحفاظ على شكله */
+        .logo-text {
             font-size: 22px;
             font-weight: bold;
             color: #e50914;
-            border-bottom: 1px solid #1c252d;
-            position: relative;
+            white-space: nowrap;
         }
-        
-        /* أزرار تبديل اللغة الاحترافية في زاوية الهيدر */
+        /* تعديل الترتيب التلقائي حسب اتجاه الصفحة */
+        html[dir="rtl"] header { flex-direction: row; }
+        html[dir="ltr"] header { flex-direction: row-reverse; }
+
+        /* أزرار تبديل اللغة الاحترافية */
         .lang-switcher {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
             display: flex;
             background-color: #121b22;
             border: 1px solid #1c252d;
@@ -37,17 +45,15 @@
             padding: 2px;
             font-size: 11px;
             cursor: pointer;
-            overflow: hidden;
+            z-index: 999; /* لجعل الأزرار قابلة للضغط دائماً فوق أي عنصر */
         }
-        html[dir="rtl"] .lang-switcher { right: 15px; }
-        html[dir="ltr"] .lang-switcher { left: 15px; }
-        
         .lang-btn {
-            padding: 4px 10px;
+            padding: 5px 12px;
             border-radius: 12px;
             color: #9aa6b1;
             font-weight: bold;
             transition: all 0.2s ease;
+            user-select: none;
         }
         .lang-btn.active {
             background-color: #e50914;
@@ -122,7 +128,7 @@
         }
         .season-tab.active { background-color: #e50914; border-color: #e50914; }
 
-        /* قائمة حلقات المسلسلات الاحترافية (مثل سينمانا) */
+        /* قائمة حلقات المسلسلات */
         .episodes-list { display: none; margin-top: 15px; flex-direction: column; gap: 10px; }
         .episode-row {
             display: flex; align-items: center; background-color: #121b22; border: 1px solid #1c252d; border-radius: 8px; padding: 10px; cursor: pointer; gap: 15px; transition: background 0.2s;
@@ -167,7 +173,7 @@
         }
         .history-list { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
         .history-item {
-            position: relative; background-color: #121b22; padding: 8px 35px 8px 12px; border-radius: 5px; font-size: 12px; white-space: nowrap; border: 1px solid #1c252d; cursor: pointer;
+            position: relative; background-color: #121b22; border-radius: 5px; font-size: 12px; white-space: nowrap; border: 1px solid #1c252d; cursor: pointer;
         }
         html[dir="rtl"] .history-item { padding: 8px 35px 8px 12px; }
         html[dir="ltr"] .history-item { padding: 8px 12px 8px 35px; }
@@ -203,10 +209,11 @@
 <body>
 
     <header>
-        <span id="txtLogo">🎬 سينما فلوكس | CinemaFlux</span>
-        <div class="lang-switcher" onclick="toggleLanguage()">
-            <span class="lang-btn active" id="btnAr">العربية</span>
-            <span class="lang-btn" id="btnEn">English</span>
+        <div class="logo-text" id="txtLogo">🎬 سينما فلوكس | CinemaFlux</div>
+        
+        <div class="lang-switcher">
+            <span class="lang-btn active" id="btnAr" onclick="setLanguage('ar')">العربية</span>
+            <span class="lang-btn" id="btnEn" onclick="setLanguage('en')">English</span>
         </div>
     </header>
 
@@ -304,7 +311,6 @@
     </div>
 
     <script>
-        // قاعدة بيانات لتجربة المسلسلات (المواسم والحلقات)
         const seriesDatabase = {
             'House of the Dragon': {
                 seasons: [
@@ -314,18 +320,11 @@
                             { title: "الحلقة 1", titleEn: "Episode 1", thumb: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=200", hd: "https://playmogo.com/e/episode1_hd", sd: "https://playmogo.com/e/episode1_sd" },
                             { title: "الحلقة 2", titleEn: "Episode 2", thumb: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=200", hd: "https://playmogo.com/e/episode2_hd", sd: "https://playmogo.com/e/episode2_sd" }
                         ]
-                    },
-                    {
-                        name: "الموسم 2", nameEn: "Season 2",
-                        episodes: [
-                            { title: "الحلقة 1", titleEn: "Episode 1", thumb: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=200", hd: "https://playmogo.com/e/s2_ep1_hd", sd: "https://playmogo.com/e/s2_ep1_sd" }
-                        ]
                     }
                 ]
             }
         };
 
-        // النصوص الخاصة بنظام ترجمة الواجهة الفوري
         const langData = {
             ar: {
                 logo: "🎬 سينما فلوكس | CinemaFlux",
@@ -341,7 +340,7 @@
                 moviesSection: "قسم الأفلام",
                 seriesSection: "قسم المسلسلات",
                 watchNow: "🎬 شاهد الآن",
-                noResults: "عذراً لا توجد نتائج ، قم بأدخل كلمات مختلفة او ربما انت قمت بكتابة الاسم بشكل غير صحيح 🔍"
+                noResults: "عذراً لا توجد نتائج ، قم بأدخال كلمات مختلفة او ربما انت قمت بكتابة الاسم بشكل غير صحيح 🔍"
             },
             en: {
                 logo: "🎬 CinemaFlux",
@@ -365,7 +364,7 @@
         let currentHD = "", currentSD = "";
         let watchHistory = JSON.parse(localStorage.getItem('cinemaFluxHistory')) || [];
 
-        // إدارة السلايدر التلقائي العلوي
+        // إدارة السلايدر العلوي
         let currentSlide = 0;
         const slides = document.querySelectorAll('.carousel-slide');
         setInterval(() => {
@@ -375,9 +374,9 @@
 
         updateHistoryUI();
 
-        // دالة تغيير اللغة للواجهة كاملة فورياً
-        function toggleLanguage() {
-            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+        // دالة تغيير اللغة الفورية عند الضغط المباشر على خيارات الأزرار
+        function setLanguage(lang) {
+            currentLang = lang;
             const html = document.getElementById('mainHtml');
             
             if (currentLang === 'ar') {
@@ -392,7 +391,10 @@
                 document.getElementById('btnAr').classList.remove('active');
             }
 
-            // تطبيق الترجمات على عناصر الصفحة
+            // تطبيق الترجمة الفورية بالكامل
             document.getElementById('txtLogo').innerText = langData[currentLang].logo;
             document.getElementById('searchInput').placeholder = langData[currentLang].searchPlaceholder;
-            document.getElementById('btnS
+            document.getElementById('btnSearchSubmit').innerText = langData[currentLang].searchBtn;
+            document.getElementById('txtHistoryTitle').innerText = langData[currentLang].historyTitle;
+            document.getElementById('txtClearHistory').innerText = langData[currentLang].clearHistory;
+            document.getEleme
