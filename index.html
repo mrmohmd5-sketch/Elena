@@ -27,15 +27,19 @@
             margin: 20px auto;
             padding: 0 15px;
         }
-        /* خانة البحث */
+        /* خانة وزر البحث المطور */
         .search-box {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             display: flex;
             justify-content: center;
+            gap: 10px;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
         .search-box input {
-            width: 100%;
-            max-width: 500px;
+            flex: 1;
             padding: 12px 20px;
             font-size: 16px;
             border: 1px solid #333;
@@ -43,12 +47,26 @@
             background-color: #222;
             color: #fff;
             outline: none;
-            text-align: center;
+            text-align: right;
             transition: 0.3s;
         }
         .search-box input:focus {
             border-color: #e50914;
             box-shadow: 0 0 8px rgba(229, 9, 20, 0.5);
+        }
+        .search-btn {
+            background-color: #e50914;
+            color: white;
+            border: none;
+            padding: 0 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .search-btn:hover {
+            background-color: #b80710;
         }
         /* مشغل الفيديو */
         .main-player {
@@ -151,6 +169,14 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+        /* رسالة عدم وجود نتائج */
+        .no-results {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #b3b3b3;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
@@ -160,7 +186,8 @@
     <div class="container">
         
         <div class="search-box">
-            <input type="text" id="searchInput" onkeyup="searchMovies()" placeholder="🔍 ابحث عن فيلمك المفضل هنا...">
+            <input type="text" id="searchInput" placeholder="ابحث عن اسم الفيلم بالعربي أو الإنجليزي...">
+            <button class="search-btn" onclick="searchMovies()">بحث</button>
         </div>
 
         <div class="main-player">
@@ -179,6 +206,8 @@
 
         <div class="section-title">أحدث الإضافات والأفلام</div>
         
+        <div id="noResultsMessage" class="no-results">عذراً، لم نجد أي فيلم بهذا الاسم! 🔍</div>
+
         <div class="movies-grid" id="moviesGrid">
             
             <div class="movie-card" onclick="playMovie('فيلم Onward مدبلج', 'قصة شقيقين من القزم يشرعان في رحلة استكشافية لمعرفة ما إذا كان لا يزال هناك بعض السحر المتبقي في العالم لقضاء يوم أخير مع والدهما الراحل.', 'https://playmogo.com/e/yuj41p7m9e3e', 'https://playmogo.com/e/yuj41p7m9e3e')">
@@ -200,27 +229,22 @@
     </div>
 
     <script>
-        // متغيرات لتخزين روابط الفيلم الحالي (عالي وضعيف)
         let currentHD = "https://playmogo.com/e/yuj41p7m9e3e";
         let currentSD = "https://playmogo.com/e/yuj41p7m9e3e"; 
 
-        // دالة تشغيل الفيلم عند الضغط عليه
         function playMovie(title, desc, hdLink, sdLink) {
             document.getElementById('currentTitle').innerText = title;
             document.getElementById('currentDesc').innerText = desc;
             currentHD = hdLink;
             currentSD = sdLink;
             
-            // تشغيل السيرفر الرئيسي افتراضياً
             document.getElementById('mainIframe').src = hdLink;
             document.getElementById('btnHD').classList.add('active');
             document.getElementById('btnSD').classList.remove('active');
             
-            // الصعود التلقائي للمشغل عند الضغط على الهاتف
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
-        // دالة تغيير السيرفر (HD أو إنترنت ضعيف)
         function changeServer(type) {
             if(type === 'HD') {
                 document.getElementById('mainIframe').src = currentHD;
@@ -233,20 +257,39 @@
             }
         }
 
-        // دالة البحث الذكي
+        // دالة البحث المحدثة والذكية (تحل مشكلة الحروف الكبيرة والصغيرة وتدعم زر البحث)
         function searchMovies() {
-            let input = document.getElementById('searchInput').value.toLowerCase();
+            let input = document.getElementById('searchInput').value.trim().toLowerCase();
             let cards = document.getElementsByClassName('movie-card');
+            let foundAny = false;
             
             for (let i = 0; i < cards.length; i++) {
                 let name = cards[i].getElementsByClassName('movie-name')[0].innerText.toLowerCase();
+                
+                // هنا الكود أصبح ذكياً: يبحث إذا كان النص المكتوب جزءاً من الاسم بأي شكل
                 if (name.includes(input)) {
                     cards[i].style.display = "";
+                    foundAny = true;
                 } else {
                     cards[i].style.display = "none";
                 }
             }
+
+            // إظهار رسالة تنبيه لو لم يجد الفيلم
+            let msg = document.getElementById('noResultsMessage');
+            if (foundAny) {
+                msg.style.display = "none";
+            } else {
+                msg.style.display = "block";
+            }
         }
+
+        // لجعل زر الـ Enter في لوحة مفاتيح الهاتف يقوم بالبحث أيضاً تلقائياً
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchMovies();
+            }
+        });
     </script>
 </body>
 </html>
