@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>سينما فلوكس | CinemaFlux</title>
     <style>
-        /* إعدادات عامة لمنع تمدد الشاشة نهائياً في الهواتف */
         html, body {
             max-width: 100%;
             overflow-x: hidden;
@@ -20,7 +19,6 @@
             box-sizing: border-box;
         }
         
-        /* الهيدر المطور مع زر الرئيسية واللغات */
         header {
             background-color: #06090c;
             padding: 15px;
@@ -42,7 +40,6 @@
             color: #e50914;
         }
 
-        /* زر الرئيسية الجديد */
         .home-btn {
             background-color: #121b22;
             color: #fff;
@@ -59,7 +56,6 @@
             border-color: #e50914;
         }
 
-        /* أزرار تبديل اللغة أسفل اللوجو */
         .lang-switcher {
             display: inline-flex;
             background-color: #121b22;
@@ -94,7 +90,6 @@
             box-sizing: border-box;
         }
         
-        /* خانة وزر البحث */
         .search-box {
             margin: 20px auto;
             display: flex;
@@ -122,7 +117,6 @@
             white-space: nowrap;
         }
 
-        /* واجهة المشغل والصفحة الداخلية */
         .main-player {
             background-color: #000;
             border-radius: 12px;
@@ -152,7 +146,6 @@
         .video-title { font-size: 18px; margin: 0 0 8px 0; font-weight: bold; }
         .video-desc { font-size: 13px; color: #9aa6b1; margin: 0; line-height: 1.6; }
 
-        /* تصفح المواسم للمسلسلات */
         .seasons-container { margin-top: 15px; display: none; padding: 10px 0; border-top: 1px solid #1c252d; }
         .section-subtitle { font-size: 14px; font-weight: bold; margin-bottom: 10px; color: #fff; }
         .seasons-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
@@ -161,7 +154,6 @@
         }
         .season-tab.active { background-color: #e50914; border-color: #e50914; }
 
-        /* قائمة حلقات المسلسلات */
         .episodes-list { display: none; margin-top: 15px; flex-direction: column; gap: 8px; }
         .episode-row {
             display: flex; align-items: center; background-color: #121b22; border: 1px solid #1c252d; border-radius: 8px; padding: 8px; cursor: pointer; gap: 12px; transition: background 0.2s;
@@ -172,10 +164,8 @@
         .episode-title { font-size: 13px; font-weight: bold; margin: 0 0 3px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .episode-meta-text { font-size: 11px; color: #9aa6b1; }
 
-        /* قسم الاقتراحات للأفلام المشابهة */
         .suggestions-box { display: none; margin-top: 20px; padding-top: 15px; border-top: 1px solid #1c252d; }
 
-        /* البانر العلوي التلقائي */
         .carousel-container {
             position: relative; width: 100%; height: 200px; border-radius: 12px; overflow: hidden; margin-bottom: 25px; border: 1px solid #1c252d;
         }
@@ -194,7 +184,6 @@
             background-color: #e50914; color: white; border: none; padding: 8px 18px; font-size: 13px; font-weight: bold; border-radius: 20px; cursor: pointer;
         }
 
-        /* سجل المشاهدة */
         .history-section {
             background-color: #06090c; padding: 12px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #1c252d; display: none;
         }
@@ -216,7 +205,6 @@
         html[dir="rtl"] .delete-item-btn { right: 10px; }
         html[dir="ltr"] .delete-item-btn { left: 10px; }
 
-        /* صفوف العرض الممررة */
         .row-header { display: flex; justify-content: space-between; align-items: center; margin: 25px 0 12px 0; }
         .row-title { font-size: 17px; font-weight: bold; color: #fff; padding: 0 8px; }
         html[dir="rtl"] .row-title { border-right: 4px solid #e50914; }
@@ -225,7 +213,6 @@
         .movies-slider::-webkit-scrollbar { height: 4px; }
         .movies-slider::-webkit-scrollbar-thumb { background-color: #1c252d; border-radius: 10px; }
         
-        /* كارت العرض */
         .movie-card { min-width: 120px; max-width: 120px; cursor: pointer; }
         .poster-wrapper { position: relative; width: 100%; height: 170px; border-radius: 8px; overflow: hidden; border: 1px solid #1c252d; }
         .movie-poster { width: 100%; height: 100%; object-fit: cover; }
@@ -323,7 +310,7 @@
                         <div class="movie-meta"><span class="imdb-badge">7.4</span><span>انيميشن</span></div>
                     </div>
                 </div>
-                </div>
+            </div>
         </div>
 
         <div id="seriesBlock">
@@ -336,7 +323,7 @@
                         <div class="movie-meta"><span class="imdb-badge">8.5</span><span>أكشن, مغامرة</span></div>
                     </div>
                 </div>
-                </div>
+            </div>
         </div>
 
     </div>
@@ -345,7 +332,6 @@
         const SHEET_ID = '1owxbbXAUGcQjgwaDFlX4ban5kRU5AGvMFxMfifJa8DI';
         const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
 
-        // مصفوفة عامة لحفظ بيانات الشيتس لمنع مشاكل علامات الاقتباس في الأزرار
         let globalMoviesData = [];
 
         const seriesDatabase = {
@@ -388,13 +374,27 @@
             updateHistoryUI();
         });
 
+        // دالة مخصصة لتنظيف الرموز ومنع تدمير أكواد الصفحة
+        function cleanString(str) {
+            if(!str) return '';
+            return str.replace(/[\r\n]+/g, ' ').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
         function fetchDataFromSheets() {
             fetch(SHEET_URL)
                 .then(res => res.text())
                 .then(data => {
-                    const temp = data.substring(data.indexOf("(") + 1, data.lastIndexOf(")"));
+                    // استخراج الـ JSON بأمان كامل حتى لو وجد خلل بالرموز
+                    const startIdx = data.indexOf("(");
+                    const endIdx = data.lastIndexOf(")");
+                    if(startIdx === -1 || endIdx === -1) return;
+                    
+                    const temp = data.substring(startIdx + 1, endIdx);
                     const jsonData = JSON.parse(temp);
                     const rows = jsonData.table.rows;
                     
                     const moviesSlider = document.getElementById('moviesSlider');
-                    const seriesSlider = document.getElementBy
+                    const seriesSlider = document.getElementById('seriesSlider');
+
+                    rows.forEach((row, index) => {
+                        if (index ==
