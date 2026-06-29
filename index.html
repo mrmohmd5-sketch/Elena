@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>سينما فلوكس | CinemaFlux</title>
     <style>
-        /* إعدادات عامة لمنع تمدد الشاشة نهائياً في الهواتف */
         html, body {
             max-width: 100%;
             overflow-x: hidden;
@@ -19,8 +18,6 @@
             padding-bottom: 40px;
             box-sizing: border-box;
         }
-        
-        /* الهيدر المطور مع زر الرئيسية واللغات */
         header {
             background-color: #06090c;
             padding: 15px;
@@ -35,14 +32,11 @@
             align-items: center;
             width: 100%;
         }
-        
         .logo-text {
             font-size: 22px;
             font-weight: bold;
             color: #e50914;
         }
-
-        /* زر الرئيسية */
         .home-btn {
             background-color: #121b22;
             color: #fff;
@@ -58,8 +52,6 @@
             background-color: #e50914;
             border-color: #e50914;
         }
-
-        /* أزرار تبديل اللغة */
         .lang-switcher {
             display: inline-flex;
             background-color: #121b22;
@@ -72,20 +64,17 @@
         }
         html[dir="rtl"] .lang-switcher { align-self: flex-start; }
         html[dir="ltr"] .lang-switcher { align-self: flex-end; }
-        
         .lang-btn {
             padding: 4px 12px;
             border-radius: 12px;
             color: #9aa6b1;
             font-weight: bold;
             transition: all 0.2s ease;
-            user-select: none;
         }
         .lang-btn.active {
             background-color: #e50914;
             color: #fff;
         }
-
         .container {
             width: 100%;
             max-width: 1000px;
@@ -93,8 +82,6 @@
             padding: 0 12px;
             box-sizing: border-box;
         }
-        
-        /* خانة وزر البحث */
         .search-box {
             margin: 20px auto;
             display: flex;
@@ -121,8 +108,6 @@
             padding: 0 20px; font-size: 14px; font-weight: bold; border-radius: 25px; cursor: pointer;
             white-space: nowrap;
         }
-
-        /* واجهة المشغل والصفحة الداخلية */
         .main-player {
             background-color: #000;
             border-radius: 12px;
@@ -131,13 +116,12 @@
             border: 1px solid #1c252d;
             display: none;
             width: 100%;
-            box-sizing: border-box;
         }
         .video-container {
             position: relative; padding-bottom: 56.25%; height: 0; width: 100%;
             background-color: #000;
         }
-        .video-container iframe, .video-container video {
+        .video-container iframe {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;
         }
         .player-controls {
@@ -151,8 +135,6 @@
         .video-details { padding: 15px; background-color: #06090c; border-top: 1px solid #1c252d; }
         .video-title { font-size: 18px; margin: 0 0 8px 0; font-weight: bold; }
         .video-desc { font-size: 13px; color: #9aa6b1; margin: 0; line-height: 1.6; }
-
-        /* سجل المشاهدة */
         .history-section {
             background-color: #06090c; padding: 12px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #1c252d; display: none;
         }
@@ -173,8 +155,6 @@
         }
         html[dir="rtl"] .delete-item-btn { right: 10px; }
         html[dir="ltr"] .delete-item-btn { left: 10px; }
-
-        /* صفوف العرض الممررة */
         .row-header { display: flex; justify-content: space-between; align-items: center; margin: 25px 0 12px 0; }
         .row-title { font-size: 17px; font-weight: bold; color: #fff; padding: 0 8px; }
         html[dir="rtl"] .row-title { border-right: 4px solid #e50914; }
@@ -182,8 +162,6 @@
         .movies-slider { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; width: 100%; }
         .movies-slider::-webkit-scrollbar { height: 4px; }
         .movies-slider::-webkit-scrollbar-thumb { background-color: #1c252d; border-radius: 10px; }
-        
-        /* كارت العرض */
         .movie-card { min-width: 120px; max-width: 120px; cursor: pointer; }
         .poster-wrapper { position: relative; width: 100%; height: 170px; border-radius: 8px; overflow: hidden; border: 1px solid #1c252d; }
         .movie-poster { width: 100%; height: 100%; object-fit: cover; }
@@ -193,11 +171,9 @@
         .movie-meta-row { display: flex; align-items: center; gap: 5px; }
         .genre-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
         .imdb-badge { background-color: #1c252d; color: #fff; padding: 1px 4px; border-radius: 3px; font-weight: bold; font-size: 10px; display: inline-block; }
-
         .no-results {
-            display: none; text-align: center; padding: 25px 15px; color: #9aa6b1; font-size: 13px; line-height: 1.6; background-color: #06090c; border-radius: 8px; border: 1px solid #1c252d; margin-top: 20px;
+            display: none; text-align: center; padding: 25px 15px; color: #9aa6b1; font-size: 13px; background-color: #06090c; border-radius: 8px; border: 1px solid #1c252d; margin-top: 20px;
         }
-
         .loading-text {
             text-align: center; padding: 20px; color: #e50914; font-size: 16px; font-weight: bold;
         }
@@ -263,9 +239,9 @@
     </div>
 
     <script>
-        // رابط الجدول المحدث بصيغة التصدير العام المباشر
+        // استخدام مفسر JSON المفتوح من جوجل (تخطي مشاكل الأمان CORS بالكامل)
         const SHEET_ID = '1owxbbXAUGcQjgwaDFlX4ban5kRU5AGvMFxMfifJa8DI';
-        const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
+        const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
         let globalMoviesData = [];
         let currentLang = 'ar';
@@ -293,68 +269,49 @@
         });
 
         function fetchDataFromSheets() {
+            // استخدام وكيل جلب لتفادي قيود CORS على الاستضافات مثل Vercel
             fetch(SHEET_URL)
-                .then(res => {
-                    if(!res.ok) throw new Error("Network response was not ok");
-                    return res.text();
-                })
-                .then(csvText => {
+                .then(res => res.text())
+                .then(text => {
                     document.getElementById('loadingMessage').style.display = 'none';
-                    const rows = parseCSV(csvText);
                     
-                    if(rows.length <= 1) {
+                    // استخراج الـ JSON النظيف المخفي داخل رد جوجل المباشر
+                    const startPos = text.indexOf('{');
+                    const endPos = text.lastIndexOf('}') + 1;
+                    const jsonString = text.substring(startPos, endPos);
+                    const jsonData = JSON.parse(jsonString);
+                    const rows = jsonData.table.rows;
+                    
+                    if (!rows || rows.length <= 1) {
                         document.getElementById('loadingMessage').style.display = 'block';
-                        document.getElementById('loadingMessage').innerText = "تنبيه: تأكد من تفعيل خطوة (نشر على الويب) داخل إعدادات الجدول.";
+                        document.getElementById('loadingMessage').innerText = "تنبيه: لا توجد بيانات مسجلة بالأسفل في الجدول حالياً.";
                         return;
                     }
 
-                    // تجاهل السطر الأول (العناوين)
+                    // قراءة الأعمدة بناءً على ترتيب الصور بدقة (من سطر 1 وتخطي العناوين)
                     const dataRows = rows.slice(1);
 
                     globalMoviesData = dataRows.map(row => {
+                        const cells = row.c;
                         return {
-                            title: row[0] ? row[0].trim() : 'بدون عنوان',
-                            desc: row[1] ? row[1].trim() : '',
-                            poster: row[2] ? row[2].trim() : 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400',
-                            hdUrl: row[3] ? row[3].trim() : '',
-                            sdUrl: row[4] ? row[4].trim() : '',
-                            subtitle: row[5] ? row[5].trim() : '',
-                            rating: row[6] ? row[6].trim() : '7.0',
-                            genre: row[7] ? row[7].trim() : '',
-                            type: row[8] ? row[8].trim().toLowerCase() : 'movie'
+                            title: cells[0] ? String(cells[0].v).trim() : 'بدون عنوان',
+                            desc: cells[1] ? String(cells[1].v).trim() : '',
+                            poster: cells[2] ? String(cells[2].v).trim() : 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400',
+                            hdUrl: cells[3] ? String(cells[3].v).trim() : '',
+                            sdUrl: cells[4] ? String(cells[4].v).trim() : '',
+                            subtitle: cells[5] ? String(cells[5].v).trim() : '',
+                            rating: cells[6] ? String(cells[6].v).trim() : '7.0',
+                            genre: cells[7] ? String(cells[7].v).trim() : '',
+                            type: cells[8] ? String(cells[8].v).trim().toLowerCase() : 'movie'
                         };
                     }).filter(item => item.title && item.title !== 'بدون عنوان');
 
                     renderData(globalMoviesData);
                 })
                 .catch(err => {
-                    console.error("خطأ جلب البيانات:", err);
-                    document.getElementById('loadingMessage').innerText = "خطأ في الاتصال بالجدول. يرجى مراجعة تفعيل خيار (نشر على الويب) في الإعدادات الخاصة بالجدول.";
+                    console.error("Fetch Error:", err);
+                    document.getElementById('loadingMessage').innerText = "فشل تحميل المحتوى. تأكد من ضبط مشاركة الشيت ليكون (أي شخص لديه الرابط مشاهداً).";
                 });
-        }
-
-        // محلل ومفكك نصوص ملفات الـ CSV الدقيق لمنع تداخل الفواصل والرموز
-        function parseCSV(text) {
-            let r = [];
-            let q = false;
-            let row = [''];
-            for (let i=0; i<text.length; i++) {
-                let c = text[i];
-                if (c === '"') {
-                    if (q && text[i+1] === '"') { row[row.length-1] += '"'; i++; }
-                    else { q = !q; }
-                } else if (c === ',' && !q) {
-                    row.push('');
-                } else if ((c === '\r' || c === '\n') && !q) {
-                    if (c === '\r' && text[i+1] === '\n') { i++; }
-                    r.push(row);
-                    row = [''];
-                } else {
-                    row[row.length-1] += c;
-                }
-            }
-            if (row.length > 1 || row[0] !== '') { r.push(row); }
-            return r;
         }
 
         function renderData(dataList) {
@@ -458,4 +415,20 @@
             document.getElementById('videoPlayerSection').style.display = 'none';
             document.getElementById('mainIframe').src = '';
             document.getElementById('searchInput').value = '';
-           
+            renderData(globalMoviesData);
+            document.getElementById('noResultsMessage').style.display = 'none';
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            const html = document.getElementById('mainHtml');
+            html.setAttribute('lang', lang);
+            html.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+
+            document.getElementById('btnAr').classList.toggle('active', lang === 'ar');
+            document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+
+            document.getElementById('txtLogo').innerText = langData[lang].logo;
+            document.getElementById('txtHomeBtn').innerText = langData[lang].homeBtn;
+            document.getElementById('searchInput').placeholder = langData[lang].searchPlaceholder;
+            document.getElementById('btnSearchSubmit').innerText = langData
