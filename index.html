@@ -263,7 +263,8 @@
     </div>
 
     <script>
-        const SHEET_ID = '1owxbbXAUGcQjgwaDFlX4ban5kRU5AGvMFxMfifJa8DI';
+        // استخدام المعرف الفعلي والمباشر للجدول الجديد الخاص بك
+        const SHEET_ID = '1vQ4dzSrtQ9iL0zQJ40cG0g1_AyVM7VC3oKQ1VdIhd_LdLKoDm5fFrOF6kLqM_FR1NrrO6EIbQlNE-1a';
         const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
 
         let globalMoviesData = [];
@@ -297,12 +298,22 @@
                 .then(data => {
                     document.getElementById('loadingMessage').style.display = 'none';
                     
-                    const temp = data.substring(data.indexOf("(") + 1, data.lastIndexOf(")"));
+                    // استخراج جزء البيانات من مخرجات جافاسكربت الجداول لضمان عدم توقف التحميل
+                    const startPos = data.indexOf("({") + 1;
+                    const endPos = data.lastIndexOf("})") + 1;
+                    if (startPos <= 0 || endPos <= 0) {
+                        throw new Error("تأكد من نشر الجدول للويب بشكل صحيح (Publish to the Web)");
+                    }
+                    
+                    const temp = data.substring(startPos, endPos);
                     const jsonData = JSON.parse(temp);
                     const rows = jsonData.table.rows;
                     
-                    // مابينج مخصص ومتوافق 100% مع ترتيب أعمدة الشيت في الصور المرفقة
-                    globalMoviesData = rows.map(row => {
+                    // تحويل وتخزين الأسطر مع فحص الصف الأول (العناوين) وتجاهله
+                    globalMoviesData = rows.map((row, index) => {
+                        if (index === 0 && row.c[0] && row.c[0].v === 'Title') return null;
+                        if (!row.c || row.c.length === 0 || !row.c[0]) return null;
+                        
                         return {
                             title: row.c[0] ? row.c[0].v : 'بدون عنوان',
                             desc: row.c[1] ? row.c[1].v : '',
@@ -314,13 +325,13 @@
                             genre: row.c[7] ? row.c[7].v : '',
                             type: row.c[8] ? row.c[8].v : 'movie'
                         };
-                    });
+                    }).filter(item => item !== null);
 
                     renderData(globalMoviesData);
                 })
                 .catch(err => {
                     console.error("خطأ في جلب بيانات الشيت:", err);
-                    document.getElementById('loadingMessage').innerText = "فشل تحميل البيانات، تأكد من نشر الشيت للويب.";
+                    document.getElementById('loadingMessage').innerText = "فشل تحميل البيانات، تأكد من عمل (نشر على الويب) لجدول البيانات الخاص بك.";
                 });
         }
 
@@ -353,7 +364,7 @@
                 `;
                 card.onclick = () => openMediaPage(index);
 
-                if (item.type.toLowerCase() === 'series') {
+                if (item.type && item.type.toLowerCase() === 'series') {
                     seriesSlider.appendChild(card);
                     hasSeries = true;
                 } else {
@@ -364,6 +375,12 @@
 
             document.getElementById('moviesBlock').style.display = hasMovies ? 'block' : 'none';
             document.getElementById('seriesBlock').style.display = hasSeries ? 'block' : 'none';
+            
+            if (!hasMovies && !hasSeries) {
+                document.getElementById('noResultsMessage').style.display = 'block';
+            } else {
+                document.getElementById('noResultsMessage').style.display = 'none';
+            }
         }
 
         function openMediaPage(index) {
@@ -413,12 +430,6 @@
             );
 
             renderData(filtered);
-
-            if (filtered.length === 0) {
-                document.getElementById('noResultsMessage').style.display = 'block';
-            } else {
-                document.getElementById('noResultsMessage').style.display = 'none';
-            }
         }
 
         function goHome() {
@@ -438,13 +449,4 @@
             document.getElementById('btnAr').classList.toggle('active', lang === 'ar');
             document.getElementById('btnEn').classList.toggle('active', lang === 'en');
 
-            document.getElementById('txtLogo').innerText = langData[lang].logo;
-            document.getElementById('txtHomeBtn').innerText = langData[lang].homeBtn;
-            document.getElementById('searchInput').placeholder = langData[lang].searchPlaceholder;
-            document.getElementById('btnSearchSubmit').innerText = langData[lang].searchBtn;
-            document.getElementById('txtHistoryTitle').innerText = langData[lang].historyTitle;
-            document.getElementById('txtClearHistory').innerText = langData[lang].clearHistory;
-            document.getElementById('btnHD').innerText = langData[lang].hdServer;
-            document.getElementById('btnSD').innerText = langData[lang].sdServer;
-            document.getElementById('btnCast').innerText = langData[lang].castBtn;
-            document.getElement
+            document.getElementById('txtLogo').
