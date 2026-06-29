@@ -263,9 +263,9 @@
     </div>
 
     <script>
-        // استخدام المعرف الفعلي والمباشر للجدول الجديد الخاص بك
-        const SHEET_ID = '1vQ4dzSrtQ9iL0zQJ40cG0g1_AyVM7VC3oKQ1VdIhd_LdLKoDm5fFrOF6kLqM_FR1NrrO6EIbQlNE-1a';
-        const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
+        // الاعتماد على صيغة تصدير CSV لسرعة التصفح وتخطي حماية جوجل
+        const SHEET_ID = '1owxbbXAUGcQjgwaDFlX4ban5kRU5AGvMFxMfifJa8DI';
+        const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
 
         let globalMoviesData = [];
         let currentLang = 'ar';
@@ -295,44 +295,65 @@
         function fetchDataFromSheets() {
             fetch(SHEET_URL)
                 .then(res => res.text())
-                .then(data => {
+                .then(csvText => {
                     document.getElementById('loadingMessage').style.display = 'none';
                     
-                    // استخراج جزء البيانات من مخرجات جافاسكربت الجداول لضمان عدم توقف التحميل
-                    const startPos = data.indexOf("({") + 1;
-                    const endPos = data.lastIndexOf("})") + 1;
-                    if (startPos <= 0 || endPos <= 0) {
-                        throw new Error("تأكد من نشر الجدول للويب بشكل صحيح (Publish to the Web)");
+                    // دالة ذكية لتحليل أسطر الـ CSV بشكل سليم مع الفواصل وعلامات الاقتباس
+                    const rows = parseCSV(csvText);
+                    
+                    if(rows.length <= 1) {
+                        document.getElementById('loadingMessage').style.display = 'block';
+                        document.getElementById('loadingMessage').innerText = "تنبيه: الجدول فارغ أو يحتاج إلى نشر للويب (Publish to web).";
+                        return;
                     }
-                    
-                    const temp = data.substring(startPos, endPos);
-                    const jsonData = JSON.parse(temp);
-                    const rows = jsonData.table.rows;
-                    
-                    // تحويل وتخزين الأسطر مع فحص الصف الأول (العناوين) وتجاهله
-                    globalMoviesData = rows.map((row, index) => {
-                        if (index === 0 && row.c[0] && row.c[0].v === 'Title') return null;
-                        if (!row.c || row.c.length === 0 || !row.c[0]) return null;
-                        
+
+                    // إزالة السطر الأول (العناوين مثل Title, Description...)
+                    const dataRows = rows.slice(1);
+
+                    globalMoviesData = dataRows.map(row => {
                         return {
-                            title: row.c[0] ? row.c[0].v : 'بدون عنوان',
-                            desc: row.c[1] ? row.c[1].v : '',
-                            poster: row.c[2] ? row.c[2].v : 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400',
-                            hdUrl: row.c[3] ? row.c[3].v : '',
-                            sdUrl: row.c[4] ? row.c[4].v : '',
-                            subtitle: row.c[5] ? row.c[5].v : '',
-                            rating: row.c[6] ? row.c[6].v : '7.0',
-                            genre: row.c[7] ? row.c[7].v : '',
-                            type: row.c[8] ? row.c[8].v : 'movie'
+                            title: row[0] || 'بدون عنوان',
+                            desc: row[1] || '',
+                            poster: row[2] || 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400',
+                            hdUrl: row[3] || '',
+                            sdUrl: row[4] || '',
+                            subtitle: row[5] || '',
+                            rating: row[6] || '7.0',
+                            genre: row[7] || '',
+                            type: row[8] || 'movie'
                         };
-                    }).filter(item => item !== null);
+                    });
 
                     renderData(globalMoviesData);
                 })
                 .catch(err => {
                     console.error("خطأ في جلب بيانات الشيت:", err);
-                    document.getElementById('loadingMessage').innerText = "فشل تحميل البيانات، تأكد من عمل (نشر على الويب) لجدول البيانات الخاص بك.";
+                    document.getElementById('loadingMessage').innerText = "فشل تحميل البيانات، تأكد من عمل (نشر على الويب) للمستند.";
                 });
+        }
+
+        // دالة مخصصة لقراءة ومعالجة نصوص ملفات الـ CSV بشكل ممتاز
+        function parseCSV(text) {
+            let p = '', r = [];
+            let q = false;
+            let row = [''];
+            for (let i=0; i<text.length; i++) {
+                let c = text[i];
+                if (c === '"') {
+                    if (q && text[i+1] === '"') { row[row.length-1] += '"'; i++; }
+                    else { q = !q; }
+                } else if (c === ',' && !q) {
+                    row.push('');
+                } else if ((c === '\r' || c === '\n') && !q) {
+                    if (c === '\r' && text[i+1] === '\n') { i++; }
+                    r.push(row);
+                    row = [''];
+                } else {
+                    row[row.length-1] += c;
+                }
+            }
+            if (row.length > 1 || row[0] !== '') { r.push(row); }
+            return r;
         }
 
         function renderData(dataList) {
@@ -346,6 +367,8 @@
             let hasSeries = false;
 
             dataList.forEach((item, index) => {
+                if(!item.title || item.title === 'بدون عنوان') return;
+
                 const card = document.createElement('div');
                 card.className = 'movie-card';
                 card.innerHTML = `
@@ -364,7 +387,7 @@
                 `;
                 card.onclick = () => openMediaPage(index);
 
-                if (item.type && item.type.toLowerCase() === 'series') {
+                if (item.type.toLowerCase().trim() === 'series') {
                     seriesSlider.appendChild(card);
                     hasSeries = true;
                 } else {
@@ -375,12 +398,6 @@
 
             document.getElementById('moviesBlock').style.display = hasMovies ? 'block' : 'none';
             document.getElementById('seriesBlock').style.display = hasSeries ? 'block' : 'none';
-            
-            if (!hasMovies && !hasSeries) {
-                document.getElementById('noResultsMessage').style.display = 'block';
-            } else {
-                document.getElementById('noResultsMessage').style.display = 'none';
-            }
         }
 
         function openMediaPage(index) {
@@ -430,6 +447,12 @@
             );
 
             renderData(filtered);
+
+            if (filtered.length === 0) {
+                document.getElementById('noResultsMessage').style.display = 'block';
+            } else {
+                document.getElementById('noResultsMessage').style.display = 'none';
+            }
         }
 
         function goHome() {
@@ -440,13 +463,4 @@
             document.getElementById('noResultsMessage').style.display = 'none';
         }
 
-        function setLanguage(lang) {
-            currentLang = lang;
-            const html = document.getElementById('mainHtml');
-            html.setAttribute('lang', lang);
-            html.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
-
-            document.getElementById('btnAr').classList.toggle('active', lang === 'ar');
-            document.getElementById('btnEn').classList.toggle('active', lang === 'en');
-
-            document.getElementById('txtLogo').
+  
