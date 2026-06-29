@@ -263,9 +263,9 @@
     </div>
 
     <script>
-        // الاعتماد على جلب البيانات كـ JSON مستقر ومباشر بدون مشاكل الحماية
+        // رابط الجدول المحدث بصيغة التصدير العام المباشر
         const SHEET_ID = '1owxbbXAUGcQjgwaDFlX4ban5kRU5AGvMFxMfifJa8DI';
-        const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+        const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
 
         let globalMoviesData = [];
         let currentLang = 'ar';
@@ -293,41 +293,68 @@
         });
 
         function fetchDataFromSheets() {
-            // استخدام fetch مع إعداد التخطي المباشر لحل تعليق المتصفح
-            fetch(SHEET_URL, { mode: 'cors' })
-                .then(res => res.text())
-                .then(data => {
+            fetch(SHEET_URL)
+                .then(res => {
+                    if(!res.ok) throw new Error("Network response was not ok");
+                    return res.text();
+                })
+                .then(csvText => {
                     document.getElementById('loadingMessage').style.display = 'none';
+                    const rows = parseCSV(csvText);
                     
-                    // تنظيف النص المسترجع من جوجل وتحويله لـ JSON
-                    const startPos = data.indexOf("({") + 1;
-                    const endPos = data.lastIndexOf("})") + 1;
-                    const jsonString = data.substring(startPos, endPos);
-                    const jsonData = JSON.parse(jsonString);
-                    const rows = jsonData.table.rows;
-                    
-                    // مابينج دقيق يتطابق 100% مع ترتيب شيت الصور المرفقة لديك (من A إلى I)
-                    globalMoviesData = rows.slice(1).map(row => {
-                        const cells = row.c;
+                    if(rows.length <= 1) {
+                        document.getElementById('loadingMessage').style.display = 'block';
+                        document.getElementById('loadingMessage').innerText = "تنبيه: تأكد من تفعيل خطوة (نشر على الويب) داخل إعدادات الجدول.";
+                        return;
+                    }
+
+                    // تجاهل السطر الأول (العناوين)
+                    const dataRows = rows.slice(1);
+
+                    globalMoviesData = dataRows.map(row => {
                         return {
-                            title: cells[0] ? String(cells[0].v) : 'بدون عنوان',
-                            desc: cells[1] ? String(cells[1].v) : '',
-                            poster: cells[2] ? String(cells[2].v) : 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400',
-                            hdUrl: cells[3] ? String(cells[3].v) : '',
-                            sdUrl: cells[4] ? String(cells[4].v) : '',
-                            subtitle: cells[5] ? String(cells[5].v) : '',
-                            rating: cells[6] ? String(cells[6].v) : '7.0',
-                            genre: cells[7] ? String(cells[7].v) : '',
-                            type: cells[8] ? String(cells[8].v).toLowerCase().trim() : 'movie'
+                            title: row[0] ? row[0].trim() : 'بدون عنوان',
+                            desc: row[1] ? row[1].trim() : '',
+                            poster: row[2] ? row[2].trim() : 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400',
+                            hdUrl: row[3] ? row[3].trim() : '',
+                            sdUrl: row[4] ? row[4].trim() : '',
+                            subtitle: row[5] ? row[5].trim() : '',
+                            rating: row[6] ? row[6].trim() : '7.0',
+                            genre: row[7] ? row[7].trim() : '',
+                            type: row[8] ? row[8].trim().toLowerCase() : 'movie'
                         };
-                    });
+                    }).filter(item => item.title && item.title !== 'بدون عنوان');
 
                     renderData(globalMoviesData);
                 })
                 .catch(err => {
-                    console.error("خطأ في جلب بيانات الشيت:", err);
-                    document.getElementById('loadingMessage').innerText = "حدث خطأ أثناء تحميل البيانات، يرجى التحقق من اتصال الإنترنت أو إعدادات الشيت.";
+                    console.error("خطأ جلب البيانات:", err);
+                    document.getElementById('loadingMessage').innerText = "خطأ في الاتصال بالجدول. يرجى مراجعة تفعيل خيار (نشر على الويب) في الإعدادات الخاصة بالجدول.";
                 });
+        }
+
+        // محلل ومفكك نصوص ملفات الـ CSV الدقيق لمنع تداخل الفواصل والرموز
+        function parseCSV(text) {
+            let r = [];
+            let q = false;
+            let row = [''];
+            for (let i=0; i<text.length; i++) {
+                let c = text[i];
+                if (c === '"') {
+                    if (q && text[i+1] === '"') { row[row.length-1] += '"'; i++; }
+                    else { q = !q; }
+                } else if (c === ',' && !q) {
+                    row.push('');
+                } else if ((c === '\r' || c === '\n') && !q) {
+                    if (c === '\r' && text[i+1] === '\n') { i++; }
+                    r.push(row);
+                    row = [''];
+                } else {
+                    row[row.length-1] += c;
+                }
+            }
+            if (row.length > 1 || row[0] !== '') { r.push(row); }
+            return r;
         }
 
         function renderData(dataList) {
@@ -341,8 +368,6 @@
             let hasSeries = false;
 
             dataList.forEach((item, index) => {
-                if (!item.title || item.title === 'بدون عنوان' || item.title.trim() === '') return;
-
                 const card = document.createElement('div');
                 card.className = 'movie-card';
                 card.innerHTML = `
@@ -433,19 +458,4 @@
             document.getElementById('videoPlayerSection').style.display = 'none';
             document.getElementById('mainIframe').src = '';
             document.getElementById('searchInput').value = '';
-            renderData(globalMoviesData);
-            document.getElementById('noResultsMessage').style.display = 'none';
-        }
-
-        function setLanguage(lang) {
-            currentLang = lang;
-            const html = document.getElementById('mainHtml');
-            html.setAttribute('lang', lang);
-            html.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
-
-            document.getElementById('btnAr').classList.toggle('active', lang === 'ar');
-            document.getElementById('btnEn').classList.toggle('active', lang === 'en');
-
-            document.getElementById('txtLogo').innerText = langData[lang].logo;
-            document.getElementById('txtHomeBtn').innerText = langData[lang].homeBtn;
-            document.getElementById('searchInput').pla
+           
