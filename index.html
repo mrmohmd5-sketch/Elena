@@ -212,9 +212,6 @@
         .no-results {
             display: none; text-align: center; padding: 25px 15px; color: #9aa6b1; font-size: 13px; line-height: 1.6; background-color: #06090c; border-radius: 8px; border: 1px solid #1c252d; margin-top: 20px;
         }
-        
-        /* تأثير التحميل من السيرفر */
-        .loading-text { text-align: center; color: #9aa6b1; font-size: 12px; padding: 10px; }
     </style>
 </head>
 <body>
@@ -317,9 +314,9 @@
     </div>
 
     <script>
-        // رابط وقراءة البيانات من جوجل شيتس الخاص بك
+        // الرابط المصلح لقراءة البيانات بدون تعليق المتصفح
         const SHEET_ID = '1owxbbXAUGcQjgwaDFlX4ban5kRU5AGvMFxMfifJa8DI';
-        const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+        const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
 
         const seriesDatabase = {
             'House of the Dragon': {
@@ -356,14 +353,16 @@
         let currentHD = "", currentSD = "", currentSub = "";
         let watchHistory = JSON.parse(localStorage.getItem('cinemaFluxHistory')) || [];
 
-        // استدعاء جلب البيانات فور تحميل الصفحة
-        fetchDataFromSheets();
+        // استدعاء جلب البيانات بعد استقرار الصفحة
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchDataFromSheets();
+            updateHistoryUI();
+        });
 
         function fetchDataFromSheets() {
             fetch(SHEET_URL)
                 .then(res => res.text())
                 .then(data => {
-                    // معالجة نص الـ JSON الراجع من جوجل شيتس المفتوح للعامة
                     const temp = data.substring(data.indexOf("(") + 1, data.lastIndexOf(")"));
                     const jsonData = JSON.parse(temp);
                     const rows = jsonData.table.rows;
@@ -371,15 +370,296 @@
                     const moviesSlider = document.getElementById('moviesSlider');
                     const seriesSlider = document.getElementById('seriesSlider');
 
-                    // قراءة الأسطر وتوليد الكروت ديناميكياً (تخطي الصف الأول للعناوين)
                     rows.forEach((row, index) => {
                         if (index === 0) return; 
                         
-                        const title = row.c[0] ? row.c[0].v : '';
-                        const desc = row.c[1] ? row.c[1].v : '';
-                        const poster = row.c[2] ? row.c[2].v : 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400';
-                        const videoHD = row.c[3] ? row.c[3].v : '';
-                        const videoSD = row.c[4] ? row.c[4].v : '';
-                        const subtitle = row.c[5] ? row.c[5].v : '';
-                        const rating = row.c[6] ? row.c[6].v : '7.0';
-   
+                        const title = row.c[0] ? String(row.c[0].v) : '';
+                        const desc = row.c[1] ? String(row.c[1].v) : '';
+                        const poster = row.c[2] ? String(row.c[2].v) : 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400';
+                        const videoHD = row.c[3] ? String(row.c[3].v) : '';
+                        const videoSD = row.c[4] ? String(row.c[4].v) : '';
+                        const subtitle = row.c[5] ? String(row.c[5].v) : '';
+                        const rating = row.c[6] ? String(row.c[6].v) : '7.0';
+                        const genre = row.c[7] ? String(row.c[7].v) : 'عام';
+                        const type = row.c[8] ? String(row.c[8].v).trim().toLowerCase() : 'movie';
+
+                        if(!title) return;
+
+                        const cleanTitle = title.replace(/'/g, "\\'");
+                        const cleanDesc = desc.replace(/'/g, "\\'");
+
+                        const cardHTML = `
+                            <div class="movie-card" data-type="${type}" onclick="openMoviePage('${cleanTitle}', '${cleanDesc}', '${videoHD}', '${videoSD}', '${subtitle}')">
+                                <div class="poster-wrapper"><img class="movie-poster" src="${poster}"></div>
+                                <div class="movie-info">
+                                    <p class="movie-name">${title}</p>
+                                    <div class="movie-meta"><span class="imdb-badge">${rating}</span><span>${genre}</span></div>
+                                </div>
+                            </div>
+                        `;
+
+                        if (type === 'movie' && moviesSlider) {
+                            moviesSlider.insertAdjacentHTML('afterbegin', cardHTML);
+                        } else if (type === 'series' && seriesSlider) {
+                            seriesSlider.insertAdjacentHTML('afterbegin', cardHTML);
+                        }
+                    });
+                })
+                .catch(err => console.log("Sheets loading fallback active"));
+        }
+
+        let currentSlide = 0;
+        setInterval(() => {
+            const slides = document.querySelectorAll('.carousel-slide');
+            const track = document.getElementById('carouselTrack');
+            if(slides.length > 0 && track) {
+                currentSlide = (currentSlide + 1) % slides.length;
+                track.style.transform = `translateX(${currentLang === 'ar' ? (currentSlide * 100) : -(currentSlide * 100)}%)`;
+            }
+        }, 4500);
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            const html = document.getElementById('mainHtml');
+            
+            if (currentLang === 'ar') {
+                html.setAttribute('dir', 'rtl');
+                html.setAttribute('lang', 'ar');
+                document.getElementById('btnAr').classList.add('active');
+                document.getElementById('btnEn').classList.remove('active');
+            } else {
+                html.setAttribute('dir', 'ltr');
+                html.setAttribute('lang', 'en');
+                document.getElementById('btnEn').classList.add('active');
+                document.getElementById('btnAr').classList.remove('active');
+            }
+
+            document.getElementById('txtLogo').innerText = langData[currentLang].logo;
+            document.getElementById('searchInput').placeholder = langData[currentLang].searchPlaceholder;
+            document.getElementById('btnSearchSubmit').innerText = langData[currentLang].searchBtn;
+            document.getElementById('txtHistoryTitle').innerText = langData[currentLang].historyTitle;
+            document.getElementById('txtClearHistory').innerText = langData[currentLang].clearHistory;
+            document.getElementById('btnHD').innerText = langData[currentLang].hdServer;
+            document.getElementById('btnSD').innerText = langData[currentLang].sdServer;
+            document.getElementById('btnCast').innerText = langData[currentLang].castBtn;
+            document.getElementById('txtSeasonsLabel').innerText = langData[currentLang].seasonsLabel;
+            document.getElementById('txtSuggestionsLabel').innerText = langData[currentLang].suggestionsLabel;
+            document.getElementById('txtMoviesSection').innerText = langData[currentLang].moviesSection;
+            document.getElementById('txtSeriesSection').innerText = langData[currentLang].seriesSection;
+            document.getElementById('noResultsMessage').innerText = langData[currentLang].noResults;
+            document.getElementById('txtWatchNow1').innerText = langData[currentLang].watchNow;
+            document.getElementById('txtWatchNow2').innerText = langData[currentLang].watchNow;
+            
+            document.getElementById('carouselTrack').style.transform = `translateX(0%)`;
+            currentSlide = 0;
+            updateHistoryUI();
+        }
+
+        function openMoviePage(title, desc, hdLink, sdLink, subLink) {
+            document.getElementById('videoPlayerSection').style.display = "block";
+            document.getElementById('seasonsArea').style.display = "none";
+            document.getElementById('episodesArea').style.display = "none";
+            document.getElementById('suggestionsArea').style.display = "block";
+
+            document.getElementById('currentTitle').innerText = title;
+            document.getElementById('currentDesc').innerText = desc;
+            
+            currentHD = hdLink; currentSD = sdLink; currentSub = subLink;
+            
+            playVideoSource(hdLink, subLink);
+
+            const slider = document.getElementById('suggestionsSlider');
+            if(slider) {
+                slider.innerHTML = `
+                    <div class="movie-card" onclick="openMoviePage('فيلم مقترح مشابه', 'وصف لفيلم مشابه ومقترح للمشاهدة.', '${hdLink}', '${sdLink}', '${subLink}')">
+                        <div class="poster-wrapper"><img class="movie-poster" src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=300"></div>
+                        <div class="movie-info"><p class="movie-name">فيلم مقترح 1</p></div>
+                    </div>
+                `;
+            }
+
+            addToHistory(title, desc, hdLink, sdLink, 'movie');
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function playVideoSource(url, subUrl) {
+            const container = document.getElementById('mediaContainer');
+            if(!container) return;
+            
+            if (url.includes('.mp4') || url.includes('drive.google') || (subUrl && subUrl !== '')) {
+                container.innerHTML = `
+                    <video id="mainVideoPlayer" controls width="100%" height="100%" style="background:#000;">
+                        <source src="${url}" type="video/mp4">
+                        ${subUrl ? `<track src="${subUrl}" kind="subtitles" srclang="ar" label="العربية" default>` : ''}
+                    </video>
+                `;
+            } else {
+                container.innerHTML = `<iframe id="mainIframe" src="${url}" allowfullscreen="true" scrolling="no"></iframe>`;
+            }
+        }
+
+        function openSeriesPage(seriesName, desc) {
+            document.getElementById('videoPlayerSection').style.display = "block";
+            document.getElementById('suggestionsArea').style.display = "none";
+            document.getElementById('seasonsArea').style.display = "block";
+            document.getElementById('episodesArea').style.display = "flex";
+
+            document.getElementById('currentTitle').innerText = seriesName;
+            document.getElementById('currentDesc').innerText = desc;
+
+            const data = seriesDatabase[seriesName];
+            if(!data) {
+                document.getElementById('mediaContainer').innerHTML = `<iframe id="mainIframe" src="" allowfullscreen="true" scrolling="no"></iframe>`;
+                return;
+            }
+
+            const tabsContainer = document.getElementById('seasonsTabs');
+            if(tabsContainer) {
+                tabsContainer.innerHTML = "";
+                data.seasons.forEach((season, index) => {
+                    const seasonLabel = currentLang === 'ar' ? season.name : season.nameEn;
+                    tabsContainer.innerHTML += `<button class="season-tab ${index===0?'active':''}" onclick="loadEpisodes('${seriesName}', ${index}, this)">${seasonLabel}</button>`;
+                });
+            }
+
+            loadEpisodes(seriesName, 0);
+            addToHistory(seriesName, desc, "", "", 'series');
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function loadEpisodes(seriesName, seasonIndex, element) {
+            if(element) {
+                document.querySelectorAll('.season-tab').forEach(btn => btn.classList.remove('active'));
+                element.classList.add('active');
+            }
+            const episodesArea = document.getElementById('episodesArea');
+            if(!episodesArea) return;
+            episodesArea.innerHTML = "";
+            
+            const season = seriesDatabase[seriesName].seasons[seasonIndex].episodes;
+            season.forEach((ep, epIdx) => {
+                const epTitle = currentLang === 'ar' ? ep.title : ep.titleEn;
+                episodesArea.innerHTML += `
+                    <div class="episode-row ${epIdx===0?'active':''}" onclick="playEpisodeLink('${ep.hd}', '${ep.sd}', this)">
+                        <img class="episode-thumb" src="${ep.thumb}">
+                        <div class="episode-info">
+                            <div class="episode-title">${epTitle}</div>
+                            <div class="episode-meta-text">سيرفر سريع • جودة HD</div>
+                        </div>
+                        <div class="episode-play-icon">▶</div>
+                    </div>
+                `;
+            });
+
+            if(season.length > 0) {
+                playEpisodeLink(season[0].hd, season[0].sd);
+            }
+        }
+
+        function playEpisodeLink(hd, sd, element) {
+            if(element) {
+                document.querySelectorAll('.episode-row').forEach(row => row.classList.remove('active'));
+                element.classList.add('active');
+            }
+            currentHD = hd; currentSD = sd;
+            playVideoSource(hd, '');
+        }
+
+        function changeServer(type) {
+            const videoElement = document.getElementById('mainVideoPlayer');
+            const iframeElement = document.getElementById('mainIframe');
+            const targetUrl = (type === 'HD') ? currentHD : currentSD;
+
+            if (type === 'HD') {
+                document.getElementById('btnHD').classList.add('active');
+                document.getElementById('btnSD').classList.remove('active');
+            } else {
+                document.getElementById('btnSD').classList.add('active');
+                document.getElementById('btnHD').classList.remove('active');
+            }
+
+            if(videoElement) {
+                videoElement.src = targetUrl;
+                videoElement.load();
+                videoElement.play();
+            } else if(iframeElement) {
+                iframeElement.src = targetUrl;
+            }
+        }
+
+        function castToTV() {
+            alert(currentLang === 'ar' ? "يرجى ربط هاتفك أو جهازك على شاشة التلفزيون الذكية بنفس شبكة Wi-Fi للبث فوراً!" : "Please connect your device to the Smart TV via the same Wi-Fi network to stream!");
+            window.print();
+        }
+
+        function addToHistory(title, desc, hdLink, sdLink, type) {
+            watchHistory = watchHistory.filter(item => item.title !== title);
+            watchHistory.unshift({ title, desc, hdLink, sdLink, type });
+            localStorage.setItem('cinemaFluxHistory', JSON.stringify(watchHistory));
+            updateHistoryUI();
+        }
+
+        function updateHistoryUI() {
+            const listContainer = document.getElementById('historyList');
+            const section = document.getElementById('historySection');
+            if (!listContainer || watchHistory.length === 0) {
+                if(section) section.style.display = "none";
+                return;
+            }
+            if(section) section.style.display = "block";
+            listContainer.innerHTML = "";
+            watchHistory.forEach((item, index) => {
+                const clickAction = item.type === 'movie' ? `openMoviePage('${item.title.replace(/'/g, "\\'")}', '${item.desc.replace(/'/g, "\\'")}', '${item.hdLink}', '${item.sdLink}', '')` : `openSeriesPage('${item.title.replace(/'/g, "\\'")}', '${item.desc.replace(/'/g, "\\'")}')`;
+                listContainer.innerHTML += `
+                    <div class="history-item">
+                        <span class="delete-item-btn" onclick="deleteHistoryItem(${index}, event)">✕</span>
+                        <span onclick="${clickAction}">${item.title}</span>
+                    </div>
+                `;
+            });
+        }
+
+        function deleteHistoryItem(index, event) {
+            event.stopPropagation();
+            watchHistory.splice(index, 1);
+            localStorage.setItem('cinemaFluxHistory', JSON.stringify(watchHistory));
+            updateHistoryUI();
+        }
+
+        function clearFullHistory() {
+            watchHistory = [];
+            localStorage.removeItem('cinemaFluxHistory');
+            updateHistoryUI();
+        }
+
+        function searchItems() {
+            let input = document.getElementById('searchInput').value.trim().toLowerCase();
+            let cards = document.getElementsByClassName('movie-card');
+            let movieFound = false, seriesFound = false;
+            
+            for (let i = 0; i < cards.length; i++) {
+                let name = cards[i].getElementsByClassName('movie-name')[0].innerText.toLowerCase();
+                let type = cards[i].getAttribute('data-type');
+                
+                if (name.includes(input)) {
+                    cards[i].style.display = "";
+                    if (type === 'movie') movieFound = true;
+                    if (type === 'series') seriesFound = true;
+                } else {
+                    cards[i].style.display = "none";
+                }
+            }
+
+            document.getElementById('moviesBlock').style.display = movieFound ? "block" : "none";
+            document.getElementById('seriesBlock').style.display = seriesFound ? "block" : "none";
+            
+            let msg = document.getElementById('noResultsMessage');
+            if(msg) msg.style.display = (!movieFound && !seriesFound) ? "block" : "none";
+        }
+
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') { searchItems(); }
+        });
+    </script>
+</body>
+</html>
