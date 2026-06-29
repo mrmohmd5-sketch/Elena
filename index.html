@@ -29,7 +29,6 @@
             flex-direction: column;
             gap: 10px;
         }
-        /* إجبار العناصر على اتباع اتجاه النص بمرونة */
         html[dir="rtl"] header { align-items: flex-start; }
         html[dir="ltr"] header { align-items: flex-end; }
         
@@ -87,7 +86,7 @@
             background-color: #121b22;
             color: #fff;
             outline: none;
-            min-width: 0; /* منع خروج الصندوق في الهواتف الصغيرة */
+            min-width: 0;
         }
         html[dir="rtl"] .search-box input { text-align: right; }
         html[dir="ltr"] .search-box input { text-align: left; }
@@ -111,8 +110,9 @@
         }
         .video-container {
             position: relative; padding-bottom: 56.25%; height: 0; width: 100%;
+            background-color: #000;
         }
-        .video-container iframe {
+        .video-container iframe, .video-container video {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;
         }
         .player-controls {
@@ -212,13 +212,15 @@
         .no-results {
             display: none; text-align: center; padding: 25px 15px; color: #9aa6b1; font-size: 13px; line-height: 1.6; background-color: #06090c; border-radius: 8px; border: 1px solid #1c252d; margin-top: 20px;
         }
+        
+        /* تأثير التحميل من السيرفر */
+        .loading-text { text-align: center; color: #9aa6b1; font-size: 12px; padding: 10px; }
     </style>
 </head>
 <body>
 
     <header>
         <div class="logo-text" id="txtLogo">🎬 سينما فلوكس | CinemaFlux</div>
-        
         <div class="lang-switcher">
             <span class="lang-btn active" id="btnAr" onclick="setLanguage('ar')">العربية</span>
             <span class="lang-btn" id="btnEn" onclick="setLanguage('en')">English</span>
@@ -241,7 +243,7 @@
         </div>
 
         <div class="main-player" id="videoPlayerSection">
-            <div class="video-container">
+            <div class="video-container" id="mediaContainer">
                 <iframe id="mainIframe" src="" allowfullscreen="true" scrolling="no"></iframe>
             </div>
             <div class="player-controls">
@@ -272,7 +274,7 @@
                 <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800');">
                     <div class="carousel-content">
                         <div class="hero-title">فيلم Onward مدبلج</div>
-                        <button class="hero-btn" id="txtWatchNow1" onclick="openMoviePage('فيلم Onward مدبلج', 'قصة شقيقين من القزم يشرعان في رحلة استكشافية لمعرفة ما إذا كان لا يزال هناك بعض السحر المتبقي في العالم لقضاء يوم أخير مع والدهما الراحل.', 'https://playmogo.com/e/yuj41p7m9e3e', 'https://playmogo.com/e/yuj41p7m9e3e')">🎬 شاهد الآن</button>
+                        <button class="hero-btn" id="txtWatchNow1" onclick="openMoviePage('Onward مدبلج', 'قصة شقيقين من القزم يشرعان في رحلة استكشافية لمعرفة ما إذا كان لا يزال هناك بعض السحر المتبقي في العالم لقضاء يوم أخير مع والدهما الراحل.', 'https://playmogo.com/e/yuj41p7m9e3e', 'https://playmogo.com/e/yuj41p7m9e3e', '')">🎬 شاهد الآن</button>
                     </div>
                 </div>
                 <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800');">
@@ -289,14 +291,14 @@
         <div id="moviesBlock">
             <div class="row-header"><div class="row-title" id="txtMoviesSection">قسم الأفلام</div></div>
             <div class="movies-slider" id="moviesSlider">
-                <div class="movie-card" data-type="movie" onclick="openMoviePage('Onward مدبلج', 'قصة شقيقين من القزم يشرعان في رحلة استكشافية لمعرفة ما إذا كان لا يزال هناك بعض السحر المتبقي في العالم لقضاء يوم أخير مع والدهما الراحل.', 'https://playmogo.com/e/yuj41p7m9e3e', 'https://playmogo.com/e/yuj41p7m9e3e')">
+                <div class="movie-card" data-type="movie" onclick="openMoviePage('Onward مدبلج', 'قصة شقيقين من القزم يشرعان في رحلة استكشافية لمعرفة ما إذا كان لا يزال هناك بعض السحر المتبقي في العالم لقضاء يوم أخير مع والدهما الراحل.', 'https://playmogo.com/e/yuj41p7m9e3e', 'https://playmogo.com/e/yuj41p7m9e3e', '')">
                     <div class="poster-wrapper"><img class="movie-poster" src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400"></div>
                     <div class="movie-info">
                         <p class="movie-name">Onward مدبلج</p>
                         <div class="movie-meta"><span class="imdb-badge">7.4</span><span>انيميشن</span></div>
                     </div>
                 </div>
-            </div>
+                </div>
         </div>
 
         <div id="seriesBlock">
@@ -309,12 +311,16 @@
                         <div class="movie-meta"><span class="imdb-badge">8.5</span><span>أكشن, مغامرة</span></div>
                     </div>
                 </div>
-            </div>
+                </div>
         </div>
 
     </div>
 
     <script>
+        // رابط وقراءة البيانات من جوجل شيتس الخاص بك
+        const SHEET_ID = '1owxbbXAUGcQjgwaDFlX4ban5kRU5AGvMFxMfifJa8DI';
+        const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+
         const seriesDatabase = {
             'House of the Dragon': {
                 seasons: [
@@ -331,260 +337,49 @@
 
         const langData = {
             ar: {
-                logo: "🎬 سينما فلوكس | CinemaFlux",
-                searchPlaceholder: "ابحث عن اسم الفيلم أو المسلسل...",
-                searchBtn: "بحث",
-                historyTitle: "سجل المشاهدة مؤخراً",
-                clearHistory: "حذف السجل بالكامل 🗑️",
-                hdServer: "سيرفر عالي الجودة",
-                sdServer: "سيرفر إنترنت ضعيف",
-                castBtn: "📺 بث للشاشة",
-                seasonsLabel: "المواسم المتوفرة:",
-                suggestionsLabel: "أفلام مشابهة قد تعجبك:",
-                moviesSection: "قسم الأفلام",
-                seriesSection: "قسم المسلسلات",
-                watchNow: "🎬 شاهد الآن",
-                noResults: "عذراً لا توجد نتائج ، قم بأدخال كلمات مختلفة او ربما انت قمت بكتابة الاسم بشكل غير صحيح 🔍"
+                logo: "🎬 سينما فلوكس | CinemaFlux", searchPlaceholder: "ابحث عن اسم الفيلم أو المسلسل...", searchBtn: "بحث",
+                historyTitle: "سجل المشاهدة مؤخراً", clearHistory: "حذف السجل بالكامل 🗑️", hdServer: "سيرفر عالي الجودة",
+                sdServer: "سيرفر إنترنت ضعيف", castBtn: "📺 بث للشاشة", seasonsLabel: "المواسم المتوفرة:",
+                suggestionsLabel: "أفلام مشابهة قد تعجبك:", moviesSection: "قسم الأفلام", seriesSection: "قسم المسلسلات",
+                watchNow: "🎬 شاهد الآن", noResults: "عذراً لا توجد نتائج ، قم بأدخل كلمات مختلفة او ربما انت قمت بكتابة الاسم بشكل غير صحيح 🔍"
             },
             en: {
-                logo: "🎬 CinemaFlux",
-                searchPlaceholder: "Search for movie or series name...",
-                searchBtn: "Search",
-                historyTitle: "Recently Watched",
-                clearHistory: "Clear Full History 🗑️",
-                hdServer: "High Quality Server",
-                sdServer: "Low Internet Server",
-                castBtn: "📺 Cast to TV",
-                seasonsLabel: "Available Seasons:",
-                suggestionsLabel: "Similar Movies You May Like:",
-                moviesSection: "Movies Section",
-                seriesSection: "Series Section",
-                watchNow: "🎬 Watch Now",
-                noResults: "Sorry, no results found. Please enter different words or check your spelling! 🔍"
+                logo: "🎬 CinemaFlux", searchPlaceholder: "Search for movie or series name...", searchBtn: "Search",
+                historyTitle: "Recently Watched", clearHistory: "Clear Full History 🗑️", hdServer: "High Quality Server",
+                sdServer: "Low Internet Server", castBtn: "📺 Cast to TV", seasonsLabel: "Available Seasons:",
+                suggestionsLabel: "Similar Movies You May Like:", moviesSection: "Movies Section", seriesSection: "Series Section",
+                watchNow: "🎬 Watch Now", noResults: "Sorry, no results found. Please enter different words or check your spelling! 🔍"
             }
         };
 
         let currentLang = 'ar';
-        let currentHD = "", currentSD = "";
+        let currentHD = "", currentSD = "", currentSub = "";
         let watchHistory = JSON.parse(localStorage.getItem('cinemaFluxHistory')) || [];
 
-        let currentSlide = 0;
-        const slides = document.querySelectorAll('.carousel-slide');
-        setInterval(() => {
-            currentSlide = (currentSlide + 1) % slides.length;
-            document.getElementById('carouselTrack').style.transform = `translateX(${currentLang === 'ar' ? (currentSlide * 100) : -(currentSlide * 100)}%)`;
-        }, 4500);
+        // استدعاء جلب البيانات فور تحميل الصفحة
+        fetchDataFromSheets();
 
-        updateHistoryUI();
+        function fetchDataFromSheets() {
+            fetch(SHEET_URL)
+                .then(res => res.text())
+                .then(data => {
+                    // معالجة نص الـ JSON الراجع من جوجل شيتس المفتوح للعامة
+                    const temp = data.substring(data.indexOf("(") + 1, data.lastIndexOf(")"));
+                    const jsonData = JSON.parse(temp);
+                    const rows = jsonData.table.rows;
+                    
+                    const moviesSlider = document.getElementById('moviesSlider');
+                    const seriesSlider = document.getElementById('seriesSlider');
 
-        function setLanguage(lang) {
-            currentLang = lang;
-            const html = document.getElementById('mainHtml');
-            
-            if (currentLang === 'ar') {
-                html.setAttribute('dir', 'rtl');
-                html.setAttribute('lang', 'ar');
-                document.getElementById('btnAr').classList.add('active');
-                document.getElementById('btnEn').classList.remove('active');
-            } else {
-                html.setAttribute('dir', 'ltr');
-                html.setAttribute('lang', 'en');
-                document.getElementById('btnEn').classList.add('active');
-                document.getElementById('btnAr').classList.remove('active');
-            }
-
-            document.getElementById('txtLogo').innerText = langData[currentLang].logo;
-            document.getElementById('searchInput').placeholder = langData[currentLang].searchPlaceholder;
-            document.getElementById('btnSearchSubmit').innerText = langData[currentLang].searchBtn;
-            document.getElementById('txtHistoryTitle').innerText = langData[currentLang].historyTitle;
-            document.getElementById('txtClearHistory').innerText = langData[currentLang].clearHistory;
-            document.getElementById('btnHD').innerText = langData[currentLang].hdServer;
-            document.getElementById('btnSD').innerText = langData[currentLang].sdServer;
-            document.getElementById('btnCast').innerText = langData[currentLang].castBtn;
-            document.getElementById('txtSeasonsLabel').innerText = langData[currentLang].seasonsLabel;
-            document.getElementById('txtSuggestionsLabel').innerText = langData[currentLang].suggestionsLabel;
-            document.getElementById('txtMoviesSection').innerText = langData[currentLang].moviesSection;
-            document.getElementById('txtSeriesSection').innerText = langData[currentLang].seriesSection;
-            document.getElementById('noResultsMessage').innerText = langData[currentLang].noResults;
-            document.getElementById('txtWatchNow1').innerText = langData[currentLang].watchNow;
-            document.getElementById('txtWatchNow2').innerText = langData[currentLang].watchNow;
-            
-            document.getElementById('carouselTrack').style.transform = `translateX(0%)`;
-            currentSlide = 0;
-            
-            updateHistoryUI();
-        }
-
-        function openMoviePage(title, desc, hdLink, sdLink) {
-            document.getElementById('videoPlayerSection').style.display = "block";
-            document.getElementById('seasonsArea').style.display = "none";
-            document.getElementById('episodesArea').style.display = "none";
-            document.getElementById('suggestionsArea').style.display = "block";
-
-            document.getElementById('currentTitle').innerText = title;
-            document.getElementById('currentDesc').innerText = desc;
-            
-            currentHD = hdLink; currentSD = sdLink;
-            document.getElementById('mainIframe').src = hdLink;
-
-            const slider = document.getElementById('suggestionsSlider');
-            slider.innerHTML = `
-                <div class="movie-card" onclick="openMoviePage('فيلم مقترح مشابه', 'وصف لفيلم مشابه ومقترح للمشاهدة.', '${hdLink}', '${sdLink}')">
-                    <div class="poster-wrapper"><img class="movie-poster" src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=300"></div>
-                    <div class="movie-info"><p class="movie-name">فيلم مقترح 1</p></div>
-                </div>
-            `;
-
-            addToHistory(title, desc, hdLink, sdLink, 'movie');
-            window.scrollTo({top: 0, behavior: 'smooth'});
-        }
-
-        function openSeriesPage(seriesName, desc) {
-            document.getElementById('videoPlayerSection').style.display = "block";
-            document.getElementById('suggestionsArea').style.display = "none";
-            document.getElementById('seasonsArea').style.display = "block";
-            document.getElementById('episodesArea').style.display = "flex";
-
-            document.getElementById('currentTitle').innerText = seriesName;
-            document.getElementById('currentDesc').innerText = desc;
-
-            const data = seriesDatabase[seriesName];
-            if(!data) return;
-
-            const tabsContainer = document.getElementById('seasonsTabs');
-            tabsContainer.innerHTML = "";
-            data.seasons.forEach((season, index) => {
-                const seasonLabel = currentLang === 'ar' ? season.name : season.nameEn;
-                tabsContainer.innerHTML += `<button class="season-tab ${index===0?'active':''}" onclick="loadEpisodes('${seriesName}', ${index}, this)">${seasonLabel}</button>`;
-            });
-
-            loadEpisodes(seriesName, 0);
-            addToHistory(seriesName, desc, "", "", 'series');
-            window.scrollTo({top: 0, behavior: 'smooth'});
-        }
-
-        function loadEpisodes(seriesName, seasonIndex, element) {
-            if(element) {
-                document.querySelectorAll('.season-tab').forEach(btn => btn.classList.remove('active'));
-                element.classList.add('active');
-            }
-            const episodesArea = document.getElementById('episodesArea');
-            episodesArea.innerHTML = "";
-            
-            const season = seriesDatabase[seriesName].seasons[seasonIndex].episodes;
-            season.forEach((ep, epIdx) => {
-                const epTitle = currentLang === 'ar' ? ep.title : ep.titleEn;
-                episodesArea.innerHTML += `
-                    <div class="episode-row ${epIdx===0?'active':''}" onclick="playEpisodeLink('${ep.hd}', '${ep.sd}', this)">
-                        <img class="episode-thumb" src="${ep.thumb}">
-                        <div class="episode-info">
-                            <div class="episode-title">${epTitle}</div>
-                            <div class="episode-meta-text">سيرفر سريع • جودة HD</div>
-                        </div>
-                        <div class="episode-play-icon">▶</div>
-                    </div>
-                `;
-            });
-
-            if(season.length > 0) {
-                playEpisodeLink(season[0].hd, season[0].sd);
-            }
-        }
-
-        function playEpisodeLink(hd, sd, element) {
-            if(element) {
-                document.querySelectorAll('.episode-row').forEach(row => row.classList.remove('active'));
-                element.classList.add('active');
-            }
-            currentHD = hd; currentSD = sd;
-            document.getElementById('mainIframe').src = hd;
-        }
-
-        function changeServer(type) {
-            if(type === 'HD') {
-                document.getElementById('mainIframe').src = currentHD;
-                document.getElementById('btnHD').classList.add('active');
-                document.getElementById('btnSD').classList.remove('active');
-            } else {
-                document.getElementById('mainIframe').src = currentSD;
-                document.getElementById('btnSD').classList.add('active');
-                document.getElementById('btnHD').classList.remove('active');
-            }
-        }
-
-        function castToTV() {
-            alert(currentLang === 'ar' ? "يرجى ربط هاتفك أو جهازك على شاشة التلفزيون الذكية بنفس شبكة Wi-Fi للبث فوراً!" : "Please connect your device to the Smart TV via the same Wi-Fi network to stream!");
-            window.print();
-        }
-
-        function addToHistory(title, desc, hdLink, sdLink, type) {
-            watchHistory = watchHistory.filter(item => item.title !== title);
-            watchHistory.unshift({ title, desc, hdLink, sdLink, type });
-            localStorage.setItem('cinemaFluxHistory', JSON.stringify(watchHistory));
-            updateHistoryUI();
-        }
-
-        function updateHistoryUI() {
-            const listContainer = document.getElementById('historyList');
-            const section = document.getElementById('historySection');
-            if (watchHistory.length === 0) {
-                section.style.display = "none";
-                return;
-            }
-            section.style.display = "block";
-            listContainer.innerHTML = "";
-            watchHistory.forEach((item, index) => {
-                const clickAction = item.type === 'movie' ? `openMoviePage('${item.title}', '${item.desc}', '${item.hdLink}', '${item.sdLink}')` : `openSeriesPage('${item.title}', '${item.desc}')`;
-                listContainer.innerHTML += `
-                    <div class="history-item">
-                        <span class="delete-item-btn" onclick="deleteHistoryItem(${index}, event)">✕</span>
-                        <span onclick="${clickAction}">${item.title}</span>
-                    </div>
-                `;
-            });
-        }
-
-        function deleteHistoryItem(index, event) {
-            event.stopPropagation();
-            watchHistory.splice(index, 1);
-            localStorage.setItem('cinemaFluxHistory', JSON.stringify(watchHistory));
-            updateHistoryUI();
-        }
-
-        function clearFullHistory() {
-            watchHistory = [];
-            localStorage.removeItem('cinemaFluxHistory');
-            updateHistoryUI();
-        }
-
-        function searchItems() {
-            let input = document.getElementById('searchInput').value.trim().toLowerCase();
-            let cards = document.getElementsByClassName('movie-card');
-            let movieFound = false, seriesFound = false;
-            
-            for (let i = 0; i < cards.length; i++) {
-                let name = cards[i].getElementsByClassName('movie-name')[0].innerText.toLowerCase();
-                let type = cards[i].getAttribute('data-type');
-                
-                if (name.includes(input)) {
-                    cards[i].style.display = "";
-                    if (type === 'movie') movieFound = true;
-                    if (type === 'series') seriesFound = true;
-                } else {
-                    cards[i].style.display = "none";
-                }
-            }
-
-            document.getElementById('moviesBlock').style.display = movieFound ? "block" : "none";
-            document.getElementById('seriesBlock').style.display = seriesFound ? "block" : "none";
-            
-            let msg = document.getElementById('noResultsMessage');
-            msg.style.display = (!movieFound && !seriesFound) ? "block" : "none";
-        }
-
-        document.getElementById('searchInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') { searchItems(); }
-        });
-    </script>
-</body>
-</html>
+                    // قراءة الأسطر وتوليد الكروت ديناميكياً (تخطي الصف الأول للعناوين)
+                    rows.forEach((row, index) => {
+                        if (index === 0) return; 
+                        
+                        const title = row.c[0] ? row.c[0].v : '';
+                        const desc = row.c[1] ? row.c[1].v : '';
+                        const poster = row.c[2] ? row.c[2].v : 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400';
+                        const videoHD = row.c[3] ? row.c[3].v : '';
+                        const videoSD = row.c[4] ? row.c[4].v : '';
+                        const subtitle = row.c[5] ? row.c[5].v : '';
+                        const rating = row.c[6] ? row.c[6].v : '7.0';
+   
